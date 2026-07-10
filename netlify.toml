@@ -1,0 +1,12 @@
+[build]
+  publish = "."
+  functions = "netlify/functions"
+  command = "npm install"
+
+[functions]
+  node_bundler = "esbuild"
+
+# Runs every Thursday at 12:00 UTC -- pays out providers for everything
+# they've earned since the last run (see payout-providers.js)
+[functions."payout-providers"]
+  schedule = "0 12 * * 4"

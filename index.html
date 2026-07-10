@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Keon's Castle Web Studio — Ready-to-Use Websites & Apps for Your Business</title>
+<meta name="description" content="Real, working websites and apps built for your business — booking systems, marketplaces, subscription apps, and more, ready to launch.">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.10.0/tabler-icons.min.css">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --accent: #8FE142; --accent-bright: #A3F255; --accent-dark: #56AB2F;
+  --bg: #0A0A0A; --surface: #141414; --border: rgba(255,255,255,0.07);
+  --text: #ffffff; --text-dim: rgba(255,255,255,0.55); --text-faint: rgba(255,255,255,0.3);
+}
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, system-ui, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+nav { position: sticky; top: 0; z-index: 100; background: rgba(10,10,10,0.9); backdrop-filter: blur(20px); border-bottom: 0.5px solid var(--border); }
+.nav-inner { max-width: 1000px; margin: 0 auto; padding: 0 24px; height: 64px; display: flex; align-items: center; justify-content: space-between; }
+.nav-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; color: #fff; font-weight: 800; font-size: 15px; }
+.nav-logo-icon { width: 36px; height: 36px; background: linear-gradient(135deg, var(--accent-bright), var(--accent-dark)); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+.nav-cta { background: linear-gradient(135deg, var(--accent-bright), var(--accent-dark)); color: #08230A; font-size: 13.5px; font-weight: 700; padding: 9px 20px; border-radius: 10px; text-decoration: none; }
+
+.hero { min-height: 80vh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 100px 24px 60px; }
+.hero-badge { display: inline-flex; align-items: center; gap: 7px; background: rgba(143,225,66,0.1); border: 1px solid rgba(143,225,66,0.25); border-radius: 20px; padding: 6px 14px; font-size: 12.5px; color: var(--accent); font-weight: 600; margin-bottom: 26px; }
+.hero h1 { font-size: clamp(32px, 6vw, 62px); font-weight: 900; line-height: 1.1; letter-spacing: -1.5px; margin-bottom: 20px; max-width: 780px; }
+.hero h1 span { background: linear-gradient(135deg, var(--accent-bright), var(--accent-dark)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.hero p { font-size: 17px; color: var(--text-dim); max-width: 560px; line-height: 1.6; margin-bottom: 34px; }
+.btn-primary { background: linear-gradient(135deg, var(--accent-bright), var(--accent-dark)); color: #08230A; font-weight: 700; font-size: 15px; padding: 14px 28px; border-radius: 12px; text-decoration: none; display: inline-block; }
+
+section { max-width: 1000px; margin: 0 auto; padding: 70px 24px; }
+.sec-title { font-size: clamp(24px, 4vw, 34px); font-weight: 800; text-align: center; margin-bottom: 40px; }
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 18px; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 24px; }
+.card .icon { font-size: 26px; margin-bottom: 12px; }
+.card h3 { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+.card p { color: var(--text-dim); font-size: 13.5px; line-height: 1.5; }
+
+.proof { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 34px; text-align: center; }
+.proof p { color: var(--text-dim); font-size: 14.5px; line-height: 1.7; max-width: 640px; margin: 0 auto; }
+
+footer { border-top: 0.5px solid var(--border); padding: 30px 24px; text-align: center; color: var(--text-faint); font-size: 12.5px; }
+footer a { color: var(--text-dim); text-decoration: none; margin: 0 8px; }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a href="../index.html" class="nav-logo"><div class="nav-logo-icon">🏰</div> KEON'S CASTLE WEB STUDIO</a>
+    <a href="mailto:hello@keonscastlellc.com" class="nav-cta">Get a quote →</a>
+  </div>
+</nav>
+
+<div class="hero">
+  <div class="hero-badge"><i class="ti ti-code" style="font-size:14px"></i> Custom web & app development</div>
+  <h1>A real website or app<br>for your business — <span>ready to use</span></h1>
+  <p>Booking systems, marketplaces, subscription apps, dashboards — built the same way we built Keon's Castle's own apps. Working software, not a mockup.</p>
+  <a href="mailto:hello@keonscastlellc.com" class="btn-primary">Start your project →</a>
+</div>
+
+<section>
+  <div class="sec-title">What we build</div>
+  <div class="grid">
+    <div class="card"><div class="icon">📅</div><h3>Booking & appointment apps</h3><p>Real scheduling, time slots, and confirmations — like our own Auto Care booking app.</p></div>
+    <div class="card"><div class="icon">🛒</div><h3>Marketplaces</h3><p>Connect customers with providers, complete with ratings, messaging, and payments.</p></div>
+    <div class="card"><div class="icon">💳</div><h3>Subscription apps</h3><p>Real Stripe-powered billing, monthly or annual plans, and account management.</p></div>
+    <div class="card"><div class="icon">🌐</div><h3>Business websites</h3><p>Fast, modern, mobile-friendly sites that actually convert visitors into customers.</p></div>
+    <div class="card"><div class="icon">📱</div><h3>Installable web apps</h3><p>Apps your customers install straight from a browser — no app store required.</p></div>
+    <div class="card"><div class="icon">🔧</div><h3>Ongoing support</h3><p>We don't disappear after launch — updates and new features as your business grows.</p></div>
+  </div>
+</section>
+
+<section>
+  <div class="proof">
+    <p>Keon's Castle LLC built and operates five of its own apps and services — LifeAdmin, Leftovers, Neighborhood Helper, Auto Care, and Roadside Warriors — using this exact process. Your project gets the same real, working approach, built specifically for your business.</p>
+  </div>
+</section>
+
+<section style="text-align:center;">
+  <div class="sec-title">Ready to get started?</div>
+  <p style="color:var(--text-dim);margin-bottom:24px;">Tell us what your business needs — we'll scope it and get you a quote.</p>
+  <a href="mailto:hello@keonscastlellc.com" class="btn-primary">Email hello@keonscastlellc.com</a>
+</section>
+
+<footer>
+  © 2026 Keon's Castle LLC — Web & App Development
+  <br><br>
+  <a href="../index.html">Keon's Castle Home</a>
+</footer>
+
+</body>
+</html>
