@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Keons Castle LLC — Smart Apps for Real Life</title>
+<meta name="description" content="Keons Castle LLC builds smart, simple apps that make everyday life easier. Track deadlines, plan meals, and connect with neighbors.">
+<meta property="og:title" content="Keons Castle LLC — Smart Apps for Real Life">
+<meta property="og:description" content="Smart apps that make everyday life easier. Try free for 14 days.">
+<meta name="theme-color" content="#0A0A0A">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.10.0/tabler-icons.min.css">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --green: #8FE142;
+  --green-bright: #A3F255;
+  --green-dark: #56AB2F;
+  --bg: #0A0A0A;
+  --surface: #141414;
+  --surface2: #1C1C1C;
+  --border: rgba(255,255,255,0.07);
+  --text: #ffffff;
+  --text-dim: rgba(255,255,255,0.5);
+  --text-faint: rgba(255,255,255,0.28);
+}
+html { scroll-behavior: smooth; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, system-ui, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+/* NAV */
+nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background: rgba(10,10,10,0.85); backdrop-filter: blur(20px); border-bottom: 0.5px solid var(--border); }
+.nav-inner { max-width: 1100px; margin: 0 auto; padding: 0 24px; height: 64px; display: flex; align-items: center; justify-content: space-between; }
+.nav-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+.nav-logo-icon { width: 36px; height: 36px; background: linear-gradient(135deg, var(--green-bright), var(--green-dark)); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+.nav-logo-text { font-size: 16px; font-weight: 800; color: #fff; letter-spacing: -0.2px; }
+.nav-logo-text span { background: linear-gradient(135deg, var(--green-bright), var(--green-dark)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.nav-links { display: flex; align-items: center; gap: 8px; }
+.nav-link { color: var(--text-dim); font-size: 14px; text-decoration: none; padding: 8px 14px; border-radius: 10px; transition: color 0.15s, background 0.15s; }
+.nav-link:hover { color: #fff; background: rgba(255,255,255,0.06); }
+.nav-cta { background: linear-gradient(135deg, var(--green-bright), var(--green-dark)); color: #08230A; font-size: 13.5px; font-weight: 700; padding: 9px 20px; border-radius: 10px; text-decoration: none; transition: transform 0.15s, box-shadow 0.15s; box-shadow: 0 4px 14px rgba(143,225,66,0.3); }
+.nav-cta:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(143,225,66,0.4); }
+.nav-mobile-menu { display: none; background: none; border: none; color: #fff; font-size: 24px; cursor: pointer; }
+@media (max-width: 640px) {
+  .nav-links { display: none; }
+  .nav-mobile-menu { display: block; }
+}
+
+/* HERO */
+.hero { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 120px 24px 80px; position: relative; overflow: hidden; }
+.hero-glow { position: absolute; top: 20%; left: 50%; transform: translateX(-50%); width: 600px; height: 600px; background: radial-gradient(circle, rgba(143,225,66,0.08) 0%, transparent 70%); pointer-events: none; }
+.hero-badge { display: inline-flex; align-items: center; gap: 7px; background: rgba(143,225,66,0.1); border: 1px solid rgba(143,225,66,0.25); border-radius: 20px; padding: 6px 14px; font-size: 12.5px; color: var(--green); font-weight: 600; margin-bottom: 28px; }
+.hero-app-strip { display: flex; flex-wrap: wrap; gap: 9px; justify-content: center; max-width: 640px; margin: 6px 0 34px; }
+.hero-app-chip { display: inline-flex; align-items: center; gap: 6px; background: color-mix(in srgb, var(--c) 14%, transparent); border: 1px solid color-mix(in srgb, var(--c) 40%, transparent); color: #fff; font-size: 13px; font-weight: 600; padding: 7px 14px; border-radius: 20px; text-decoration: none; transition: transform 0.15s, background 0.15s; }
+.hero-app-chip:hover { background: color-mix(in srgb, var(--c) 24%, transparent); transform: translateY(-2px); }
+.hero h1 { font-size: clamp(36px, 6vw, 72px); font-weight: 900; line-height: 1.05; letter-spacing: -1.5px; margin-bottom: 22px; max-width: 820px; }
+.hero h1 .highlight { background: linear-gradient(135deg, var(--green-bright), var(--green-dark)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.hero p { font-size: clamp(16px, 2vw, 20px); color: var(--text-dim); max-width: 560px; line-height: 1.6; margin-bottom: 40px; }
+.hero-btns { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin-bottom: 60px; }
+.btn-primary { background: linear-gradient(135deg, var(--green-bright), var(--green-dark)); color: #08230A; font-size: 15px; font-weight: 800; padding: 14px 28px; border-radius: 13px; text-decoration: none; box-shadow: 0 6px 24px rgba(143,225,66,0.35); transition: transform 0.15s, box-shadow 0.15s; }
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(143,225,66,0.45); }
+.btn-secondary { background: rgba(255,255,255,0.07); color: #fff; font-size: 15px; font-weight: 600; padding: 14px 28px; border-radius: 13px; text-decoration: none; border: 1px solid var(--border); transition: background 0.15s; }
+.btn-secondary:hover { background: rgba(255,255,255,0.11); }
+.hero-stats { display: flex; gap: 40px; flex-wrap: wrap; justify-content: center; }
+.hero-stat { text-align: center; }
+.hero-stat-num { font-size: 28px; font-weight: 800; background: linear-gradient(135deg, var(--green-bright), var(--green-dark)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.hero-stat-label { font-size: 12px; color: var(--text-faint); margin-top: 3px; }
+
+/* SECTION */
+section { max-width: 1100px; margin: 0 auto; padding: 80px 24px; }
+.section-badge { display: inline-flex; align-items: center; gap: 6px; background: rgba(143,225,66,0.08); border: 1px solid rgba(143,225,66,0.2); border-radius: 20px; padding: 5px 13px; font-size: 12px; color: var(--green); font-weight: 600; margin-bottom: 18px; }
+.section-title { font-size: clamp(28px, 4vw, 42px); font-weight: 800; letter-spacing: -0.8px; margin-bottom: 14px; }
+.section-sub { font-size: 16px; color: var(--text-dim); max-width: 520px; line-height: 1.6; margin-bottom: 48px; }
+.divider { height: 0.5px; background: var(--border); max-width: 1100px; margin: 0 auto; }
+
+/* APPS GRID */
+.apps-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+.app-card { background: var(--surface); border: 0.5px solid var(--border); border-radius: 22px; padding: 28px; display: flex; flex-direction: column; gap: 18px; transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s; cursor: pointer; text-decoration: none; color: inherit; }
+.app-card:hover { transform: translateY(-4px); border-color: rgba(143,225,66,0.3); box-shadow: 0 20px 50px rgba(0,0,0,0.3); }
+.app-card-header { display: flex; align-items: center; gap: 14px; }
+.app-card-icon { width: 56px; height: 56px; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 26px; flex-shrink: 0; }
+.aci-green { background: linear-gradient(135deg, rgba(143,225,66,0.2), rgba(86,171,47,0.1)); border: 1px solid rgba(143,225,66,0.2); }
+.aci-teal { background: linear-gradient(135deg, rgba(74,180,113,0.2), rgba(47,171,100,0.1)); border: 1px solid rgba(74,180,113,0.2); }
+.aci-blue { background: linear-gradient(135deg, rgba(96,165,250,0.2), rgba(37,99,235,0.1)); border: 1px solid rgba(96,165,250,0.2); }
+.aci-orange { background: linear-gradient(135deg, rgba(251,146,60,0.2), rgba(234,88,12,0.1)); border: 1px solid rgba(251,146,60,0.2); }
+.aci-sky { background: linear-gradient(135deg, rgba(79,168,224,0.2), rgba(46,127,184,0.1)); border: 1px solid rgba(79,168,224,0.2); }
+.aci-gold { background: linear-gradient(135deg, rgba(255,198,92,0.2), rgba(217,138,11,0.1)); border: 1px solid rgba(255,198,92,0.2); }
+.app-card-name { font-size: 20px; font-weight: 700; margin-bottom: 2px; }
+.app-card-tagline { font-size: 12.5px; color: var(--text-faint); }
+.app-card-desc { font-size: 14px; color: var(--text-dim); line-height: 1.6; flex: 1; }
+.app-card-features { display: flex; flex-direction: column; gap: 8px; }
+.app-feature { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-dim); }
+.app-feature i { color: var(--green); font-size: 15px; flex-shrink: 0; }
+.app-card-footer { display: flex; align-items: center; justify-content: space-between; padding-top: 16px; border-top: 0.5px solid var(--border); }
+.app-card-price { font-size: 13px; color: var(--text-faint); }
+.app-card-price strong { color: var(--green); font-size: 15px; }
+.app-card-btn { background: linear-gradient(135deg, var(--green-bright), var(--green-dark)); color: #08230A; font-size: 13px; font-weight: 700; padding: 9px 18px; border-radius: 10px; text-decoration: none; transition: transform 0.15s; }
+.app-card-btn:hover { transform: scale(1.03); }
+.app-card.coming-soon { opacity: 0.6; cursor: default; }
+.app-card.coming-soon:hover { transform: none; border-color: var(--border); box-shadow: none; }
+.coming-badge { background: rgba(255,255,255,0.07); color: var(--text-faint); font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 6px; }
+
+/* HOW IT WORKS */
+.steps-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+.step-card { background: var(--surface); border: 0.5px solid var(--border); border-radius: 18px; padding: 24px; }
+.step-num { width: 36px; height: 36px; border-radius: 10px; background: rgba(143,225,66,0.12); color: var(--green); font-size: 16px; font-weight: 800; display: flex; align-items: center; justify-content: center; margin-bottom: 14px; }
+.step-title { font-size: 16px; font-weight: 600; margin-bottom: 6px; }
+.step-desc { font-size: 13.5px; color: var(--text-dim); line-height: 1.5; }
+
+/* TRUST */
+.trust-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; }
+.trust-card { background: var(--surface); border: 0.5px solid var(--border); border-radius: 16px; padding: 20px; display: flex; align-items: center; gap: 14px; }
+.trust-icon { width: 40px; height: 40px; border-radius: 11px; background: rgba(143,225,66,0.1); color: var(--green); font-size: 19px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.trust-text .t { color: #fff; font-size: 14px; font-weight: 600; }
+.trust-text .s { color: var(--text-faint); font-size: 12px; margin-top: 2px; }
+
+/* CTA SECTION */
+.cta-section { background: var(--surface); border: 0.5px solid var(--border); border-radius: 28px; padding: 60px 40px; text-align: center; max-width: 1100px; margin: 0 auto 80px; }
+.cta-section h2 { font-size: clamp(28px, 4vw, 44px); font-weight: 800; margin-bottom: 14px; letter-spacing: -0.8px; }
+.cta-section p { font-size: 16px; color: var(--text-dim); margin-bottom: 32px; }
+
+/* FOOTER */
+footer { border-top: 0.5px solid var(--border); padding: 40px 24px; text-align: center; }
+.footer-inner { max-width: 1100px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; gap: 16px; }
+.footer-logo { font-size: 15px; font-weight: 700; color: #fff; }
+.footer-logo span { background: linear-gradient(135deg, var(--green-bright), var(--green-dark)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.footer-links { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; }
+.footer-link { color: var(--text-faint); font-size: 13px; text-decoration: none; }
+.footer-link:hover { color: var(--green); }
+.footer-copy { color: var(--text-faint); font-size: 12px; }
+
+/* RESPONSIVE */
+@media (max-width: 640px) {
+  .hero { padding: 100px 20px 60px; }
+  .hero-stats { gap: 24px; }
+  .cta-section { padding: 40px 24px; border-radius: 20px; }
+  section { padding: 60px 20px; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <a class="nav-logo" href="#">
+      <div class="nav-logo-icon">🏰</div>
+      <div class="nav-logo-text">Keons <span>Castle</span> LLC</div>
+    </a>
+    <div class="nav-links">
+      <a class="nav-link" href="#apps">Our Apps</a>
+      <a class="nav-link" href="#how">How it works</a>
+      <a class="nav-link" href="#trust">Why us</a>
+      <a class="nav-cta" href="#apps">Get Started Free</a>
+    </div>
+    <button class="nav-mobile-menu" onclick="toggleMenu()" aria-label="Menu"><i class="ti ti-menu-2"></i></button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-glow"></div>
+  <div class="hero-badge"><i class="ti ti-stars" style="font-size:14px"></i> Everything Keon's Castle LLC offers</div>
+  <h1>Life runs smoother<br>with the right <span class="highlight">tools</span></h1>
+  <p>Keon's Castle LLC builds apps and services that handle the stuff you always forget — deadlines, meals, neighbors, your car, and even the road. One company, six ways to make life easier.</p>
+  <div class="hero-app-strip">
+    <a href="lifeadmin-pwa/index.html" class="hero-app-chip" style="--c:#8FE142;">📋 LifeAdmin</a>
+    <a href="neighborhood-helper/index.html" class="hero-app-chip" style="--c:#60A5FA;">🗺️ Neighborhood Helper</a>
+    <a href="leftovers/index.html" class="hero-app-chip" style="--c:#4AB471;">🌿 Leftovers</a>
+    <a href="mobile-auto-care/index.html" class="hero-app-chip" style="--c:#FB923C;">🔧 Auto Care</a>
+    <a href="roadside-assist/index.html" class="hero-app-chip" style="--c:#4FA8E0;">⚔️ Roadside Warriors</a>
+    <a href="lifeadmin-pwa/index.html" class="hero-app-chip" style="--c:#FFC65C;">📖 Guides</a>
+  </div>
+  <div class="hero-btns">
+    <a class="btn-primary" href="#apps">Explore everything</a>
+    <a class="btn-secondary" href="#how">How it works</a>
+  </div>
+  <div class="hero-stats">
+    <div class="hero-stat"><div class="hero-stat-num">14</div><div class="hero-stat-label">Day free trial</div></div>
+    <div class="hero-stat"><div class="hero-stat-num">6</div><div class="hero-stat-label">Apps & services</div></div>
+    <div class="hero-stat"><div class="hero-stat-num">$3.99</div><div class="hero-stat-label">Starting price/mo</div></div>
+    <div class="hero-stat"><div class="hero-stat-num">0</div><div class="hero-stat-label">App store needed</div></div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- APPS -->
+<section id="apps">
+  <div class="section-badge"><i class="ti ti-grid-dots" style="font-size:13px"></i> Our apps</div>
+  <div class="section-title">Everything you need,<br>nothing you don't</div>
+  <div class="section-sub">Each app solves one real problem — simply and beautifully. Pick the one you need or get them all.</div>
+
+  <div class="apps-grid">
+
+    <!-- LIFEADMIN -->
+    <a class="app-card" href="lifeadmin-pwa/index.html" aria-label="LifeAdmin app">
+      <div class="app-card-header">
+        <div class="app-card-icon aci-green">
+          <svg width="28" height="34" viewBox="0 0 130 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <defs><linearGradient id="lgA" x1="65" y1="0" x2="65" y2="160" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#C2F26B"/><stop offset="100%" stop-color="#5BAA22"/></linearGradient></defs>
+            <rect x="6" y="6" width="118" height="148" rx="44" stroke="url(#lgA)" stroke-width="7" fill="none"/>
+            <line x1="65" y1="88" x2="65" y2="118" stroke="url(#lgA)" stroke-width="6.5" stroke-linecap="round"/>
+            <circle cx="65" cy="44" r="18" stroke="url(#lgA)" stroke-width="6" fill="none"/>
+            <circle cx="46" cy="54" r="16" stroke="url(#lgA)" stroke-width="6" fill="none"/>
+            <circle cx="84" cy="54" r="16" stroke="url(#lgA)" stroke-width="6" fill="none"/>
+            <circle cx="65" cy="44" r="11" fill="#141414"/>
+            <path d="M22 118 Q40 110 65 118 Q90 126 108 118" stroke="url(#lgA)" stroke-width="5.5" stroke-linecap="round" fill="none"/>
+          </svg>
+        </div>
+        <div>
+          <div class="app-card-name">LifeAdmin</div>
+          <div class="app-card-tagline">Helping life move forward</div>
+        </div>
+      </div>
+      <div class="app-card-desc">Never miss a deadline again. Scan your documents and let AI track every expiration date — registrations, passports, prescriptions, insurance, and more.</div>
+      <div class="app-card-features">
+        <div class="app-feature"><i class="ti ti-scan"></i> AI document scanning — extracts dates instantly</div>
+        <div class="app-feature"><i class="ti ti-bell"></i> Smart reminders — 90, 30 & 7 days before</div>
+        <div class="app-feature"><i class="ti ti-users"></i> Family dashboard — track everyone's docs</div>
+        <div class="app-feature"><i class="ti ti-cloud"></i> Secure cloud backup</div>
+      </div>
+      <div class="app-card-footer">
+        <div class="app-card-price">14-day free trial · then <strong>$3.99/mo</strong></div>
+        <span class="app-card-btn">Try free →</span>
+      </div>
+    </a>
+
+    <!-- LEFTOVERS -->
+    <a class="app-card" href="leftovers/index.html" aria-label="Leftovers app">
+      <div class="app-card-header">
+        <div class="app-card-icon aci-teal">🌿</div>
+        <div>
+          <div class="app-card-name">Leftovers</div>
+          <div class="app-card-tagline">Cook what you already have</div>
+        </div>
+      </div>
+      <div class="app-card-desc">Stop asking "what can I make tonight?" Scan your pantry and fridge — AI generates recipes from what you already own before food expires.</div>
+      <div class="app-card-features">
+        <div class="app-feature"><i class="ti ti-package"></i> Scan pantry & track expiration dates</div>
+        <div class="app-feature"><i class="ti ti-chef-hat"></i> AI recipes from your ingredients</div>
+        <div class="app-feature"><i class="ti ti-alert-triangle"></i> Use-before alerts for expiring food</div>
+        <div class="app-feature"><i class="ti ti-shopping-cart"></i> Auto shopping list for missing items</div>
+      </div>
+      <div class="app-card-footer">
+        <div class="app-card-price">14-day free trial · then <strong>$3.99/mo</strong></div>
+        <span class="app-card-btn">Try free →</span>
+      </div>
+    </a>
+
+    <!-- NEIGHBORHOOD HELPER -->
+    <a class="app-card" href="neighborhood-helper/index.html" aria-label="Neighborhood Helper app">
+      <div class="app-card-header">
+        <div class="app-card-icon aci-blue">🗺️</div>
+        <div>
+          <div class="app-card-name">Neighborhood Helper</div>
+          <div class="app-card-tagline">Hyperlocal skill exchange</div>
+        </div>
+      </div>
+      <div class="app-card-desc">Need someone to jump-start your car or borrow a ladder? Connect with verified neighbors for quick tasks — no professional required.</div>
+      <div class="app-card-features">
+        <div class="app-feature"><i class="ti ti-map-pin"></i> Post tasks in under a minute</div>
+        <div class="app-feature"><i class="ti ti-shield-check"></i> Verified local users with ratings</div>
+        <div class="app-feature"><i class="ti ti-cash"></i> Optional tips or fixed prices $10–$50</div>
+        <div class="app-feature"><i class="ti ti-urgent"></i> Emergency request option</div>
+      </div>
+      <div class="app-card-footer">
+        <div class="app-card-price">14-day free trial · then <strong>$3.99/mo</strong></div>
+        <span class="app-card-btn">Try free →</span>
+      </div>
+    </a>
+
+    <a class="app-card" href="mobile-auto-care/index.html" aria-label="Keon's Castle Auto Care">
+      <div class="app-card-header">
+        <div class="app-card-icon aci-orange">🔧</div>
+        <div>
+          <div class="app-card-name">Auto Care</div>
+          <div class="app-card-tagline">Mechanic & detailing, at your door</div>
+        </div>
+      </div>
+      <div class="app-card-desc">Book a mobile mechanic or detailer to come straight to your home or office. Real appointment booking, real reviews, no shop visit required.</div>
+      <div class="app-card-features">
+        <div class="app-feature"><i class="ti ti-calendar-event"></i> Book real appointments online</div>
+        <div class="app-feature"><i class="ti ti-tools"></i> Mechanic work & detailing packages</div>
+        <div class="app-feature"><i class="ti ti-star"></i> Leave & read customer reviews</div>
+        <div class="app-feature"><i class="ti ti-map-pin"></i> We come to you</div>
+      </div>
+      <div class="app-card-footer">
+        <div class="app-card-price">Pay per service · no subscription</div>
+        <span class="app-card-btn">Book now →</span>
+      </div>
+    </a>
+
+    <a class="app-card" href="roadside-assist/index.html" aria-label="Roadside Warriors">
+      <div class="app-card-header">
+        <div class="app-card-icon aci-sky">⚔️</div>
+        <div>
+          <div class="app-card-name">Roadside Warriors</div>
+          <div class="app-card-tagline">We come do battle for you</div>
+        </div>
+      </div>
+      <div class="app-card-desc">Stuck on the road? Get connected with a verified nearby provider for a jumpstart, tire change, tire plug, or fuel delivery — track your live ETA the whole way.</div>
+      <div class="app-card-features">
+        <div class="app-feature"><i class="ti ti-map-pin"></i> Live ETA tracking</div>
+        <div class="app-feature"><i class="ti ti-shield-check"></i> Verified providers only</div>
+        <div class="app-feature"><i class="ti ti-percentage"></i> Providers keep 95% of earnings</div>
+        <div class="app-feature"><i class="ti ti-clock"></i> Available 24/7</div>
+      </div>
+      <div class="app-card-footer">
+        <div class="app-card-price">$50 dispatch fee + service charge</div>
+        <span class="app-card-btn">Get help now →</span>
+      </div>
+    </a>
+
+    <a class="app-card" href="lifeadmin-pwa/index.html" aria-label="Business & Credit Guides">
+      <div class="app-card-header">
+        <div class="app-card-icon aci-gold"><i class="ti ti-book-2"></i></div>
+        <div>
+          <div class="app-card-name">Business & Credit Guides</div>
+          <div class="app-card-tagline">Authored by L. Gilchrist</div>
+        </div>
+      </div>
+      <div class="app-card-desc">Advisory guides on building credit, structuring an LLC, and securing business funding — plus ready-to-use dispute letter templates. Available inside the LifeAdmin app.</div>
+      <div class="app-card-features">
+        <div class="app-feature"><i class="ti ti-trending-up"></i> Credit-building strategy guides</div>
+        <div class="app-feature"><i class="ti ti-building-bank"></i> LLC funding playbooks</div>
+        <div class="app-feature"><i class="ti ti-file-text"></i> Fillable dispute letter templates</div>
+        <div class="app-feature"><i class="ti ti-download"></i> Instant download</div>
+      </div>
+      <div class="app-card-footer">
+        <div class="app-card-price">From $7.99 per guide</div>
+        <span class="app-card-btn">Browse guides →</span>
+      </div>
+    </a>
+
+    <a class="app-card" href="web-studio/index.html" aria-label="Keon's Castle Web Studio">
+      <div class="app-card-header">
+        <div class="app-card-icon aci-green"><i class="ti ti-code"></i></div>
+        <div>
+          <div class="app-card-name">Web Studio</div>
+          <div class="app-card-tagline">Ready-to-use websites & apps</div>
+        </div>
+      </div>
+      <div class="app-card-desc">Need a real website or app for your own business? We build booking systems, marketplaces, subscription apps, and business sites — the same way we built our own five apps.</div>
+      <div class="app-card-features">
+        <div class="app-feature"><i class="ti ti-code"></i> Real, working software — not a mockup</div>
+        <div class="app-feature"><i class="ti ti-credit-card"></i> Stripe-powered payments & subscriptions</div>
+        <div class="app-feature"><i class="ti ti-devices"></i> Installable web apps, no app store needed</div>
+        <div class="app-feature"><i class="ti ti-headset"></i> Ongoing support after launch</div>
+      </div>
+      <div class="app-card-footer">
+        <div class="app-card-price">Custom quote per project</div>
+        <span class="app-card-btn">Get a quote →</span>
+      </div>
+    </a>
+
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- HOW IT WORKS -->
+<section id="how">
+  <div class="section-badge"><i class="ti ti-steps" style="font-size:13px"></i> How it works</div>
+  <div class="section-title">Up and running<br>in minutes</div>
+  <div class="section-sub">No app store. No lengthy setup. Just tap, sign up, and start using it — on any device.</div>
+  <div class="steps-grid">
+    <div class="step-card">
+      <div class="step-num">1</div>
+      <div class="step-title">Choose your app</div>
+      <div class="step-desc">Pick the app that solves your problem. Each one has a free 14-day trial — no credit card required to start.</div>
+    </div>
+    <div class="step-card">
+      <div class="step-num">2</div>
+      <div class="step-title">Create your account</div>
+      <div class="step-desc">Sign up with email or Google in seconds. Your data is private, encrypted, and backed up automatically.</div>
+    </div>
+    <div class="step-card">
+      <div class="step-num">3</div>
+      <div class="step-title">Install on your device</div>
+      <div class="step-desc">Tap "Add to Home Screen" and it works just like a regular app — on iPhone, Android, or desktop.</div>
+    </div>
+    <div class="step-card">
+      <div class="step-num">4</div>
+      <div class="step-title">Subscribe when ready</div>
+      <div class="step-desc">After your free trial, choose monthly or yearly. Cancel anytime — no hidden fees, no surprises.</div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- TRUST -->
+<section id="trust">
+  <div class="section-badge"><i class="ti ti-shield-check" style="font-size:13px"></i> Why Keons Castle</div>
+  <div class="section-title">Built different.<br>Built for you.</div>
+  <div class="section-sub">We build apps that actually solve problems — not apps that look pretty and do nothing.</div>
+  <div class="trust-grid">
+    <div class="trust-card"><div class="trust-icon"><i class="ti ti-lock"></i></div><div class="trust-text"><div class="t">256-bit encryption</div><div class="s">Your data is always secure</div></div></div>
+    <div class="trust-card"><div class="trust-icon"><i class="ti ti-device-mobile"></i></div><div class="trust-text"><div class="t">Works on everything</div><div class="s">iPhone, Android, desktop</div></div></div>
+    <div class="trust-card"><div class="trust-icon"><i class="ti ti-refresh"></i></div><div class="trust-text"><div class="t">Cancel anytime</div><div class="s">No contracts, no tricks</div></div></div>
+    <div class="trust-card"><div class="trust-icon"><i class="ti ti-wifi-off"></i></div><div class="trust-text"><div class="t">Works offline</div><div class="s">No internet? No problem</div></div></div>
+    <div class="trust-card"><div class="trust-icon"><i class="ti ti-headset"></i></div><div class="trust-text"><div class="t">Real support</div><div class="s">Talk to a real person</div></div></div>
+    <div class="trust-card"><div class="trust-icon"><i class="ti ti-star"></i></div><div class="trust-text"><div class="t">14-day free trial</div><div class="s">Try before you pay — always</div></div></div>
+  </div>
+</section>
+
+<!-- CTA -->
+<div style="padding: 0 24px;">
+  <div class="cta-section">
+    <h2>Ready to make life<br><span style="background:linear-gradient(135deg,#A3F255,#56AB2F);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">a little easier?</span></h2>
+    <p>Join thousands of people using Keons Castle apps every day. Start free — no credit card needed.</p>
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+      <a class="btn-primary" href="#apps">Start your free trial</a>
+      <a class="btn-secondary" href="mailto:hello@keonscastlellc.com">Contact us</a>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-logo">Keons <span>Castle</span> LLC</div>
+    <div class="footer-links">
+      <a class="footer-link" href="#apps">Apps</a>
+      <a class="footer-link" href="#how">How it works</a>
+      <a class="footer-link" href="mailto:hello@keonscastlellc.com">Contact</a>
+      <a class="footer-link" href="privacy.html">Privacy Policy</a>
+      <a class="footer-link" href="terms.html">Terms of Service</a>
+    </div>
+    <div class="footer-copy">© 2026 Keons Castle LLC. All rights reserved.</div>
+  </div>
+</footer>
+
+<script>
+function toggleMenu() {
+  const links = document.querySelector('.nav-links');
+  if (links.style.display === 'flex') {
+    links.style.display = 'none';
+  } else {
+    links.style.display = 'flex';
+    links.style.flexDirection = 'column';
+    links.style.position = 'absolute';
+    links.style.top = '64px';
+    links.style.left = '0';
+    links.style.right = '0';
+    links.style.background = '#0A0A0A';
+    links.style.padding = '16px 24px 24px';
+    links.style.borderBottom = '0.5px solid rgba(255,255,255,0.07)';
+  }
+}
+</script>
+</body>
+</html>
