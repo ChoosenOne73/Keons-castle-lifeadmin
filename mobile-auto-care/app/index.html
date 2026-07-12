@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<title>Keon's Castle Auto Care — Book a Mechanic or Detailer</title>
+<meta name="description" content="Book mobile mechanic and detailing appointments, track your service history, and leave reviews.">
+
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0D0D0D">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Auto Care">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512.png">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.10.0/tabler-icons.min.css">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="app" id="app">
+  <div class="status-bar">
+    <span id="clock">9:41</span>
+    <span class="status-icons">●●●</span>
+    <button class="app-menu-btn" onclick="openAppMenu()" aria-label="Menu"><i class="ti ti-dots-vertical"></i></button>
+  </div>
+
+  <!-- ===== HOME ===== -->
+  <div class="screen active" id="screen-home">
+    <div class="top-header">
+      <div class="row">
+        <div class="brand-row">
+          <div class="ac-logo">🔧</div>
+          <div>
+            <div class="brand-name">AUTO CARE</div>
+            <div class="brand-tagline">Mechanic & detailing, at your door</div>
+          </div>
+        </div>
+        <div class="avatar">MR</div>
+      </div>
+    </div>
+    <div class="scroll-area">
+      <div class="stat-row">
+        <div class="stat orange"><div class="stat-num" id="stat-upcoming">1</div><div class="stat-label">Upcoming</div></div>
+        <div class="stat green"><div class="stat-num" id="stat-completed">5</div><div class="stat-label">Completed</div></div>
+        <div class="stat amber"><div class="stat-num" id="stat-rating">4.9</div><div class="stat-label">Your rating avg</div></div>
+      </div>
+      <div class="next-appt-card" id="nextApptCard" style="display:none;" onclick="showScreen('screen-appointments')"></div>
+      <div class="scan-bar" onclick="showScreen('screen-services')">
+        <i class="ti ti-calendar-plus"></i>
+        <div class="scan-bar-text"><div class="t">Book an appointment</div><div class="s">Mechanic work or detailing, at your location</div></div>
+        <i class="ti ti-chevron-right arr"></i>
+      </div>
+      <div class="sec-title">Popular services</div>
+      <div class="doc-list" id="home-service-list" style="padding-bottom:8px;"></div>
+      <div class="sec-title" style="margin-top:14px;">Recent reviews</div>
+      <div id="home-review-list" style="padding-bottom:16px;"></div>
+    </div>
+  </div>
+
+  <!-- ===== SERVICES ===== -->
+  <div class="screen" id="screen-services">
+    <div class="top-header">
+      <div class="row"><div class="page-title">Services</div><div class="avatar">MR</div></div>
+      <div class="page-sub">Choose a service to book</div>
+    </div>
+    <div class="filter-row">
+      <div class="chip active" data-cat="All" onclick="setServiceFilter(this)">All</div>
+      <div class="chip" data-cat="Mechanic" onclick="setServiceFilter(this)">Mechanic</div>
+      <div class="chip" data-cat="Detailing" onclick="setServiceFilter(this)">Detailing</div>
+    </div>
+    <div class="scroll-area">
+      <div class="doc-list" id="services-list" style="padding-top:14px;padding-bottom:16px;"></div>
+    </div>
+  </div>
+
+  <!-- ===== BOOK ===== -->
+  <div class="screen" id="screen-book">
+    <div class="detail-header">
+      <div class="back-btn" onclick="goBack()"><i class="ti ti-arrow-left"></i></div>
+      <div class="detail-title">Book Appointment</div>
+    </div>
+    <div class="scroll-area">
+      <div style="padding:16px 20px 0;">
+        <div class="modal-field">
+          <label class="modal-label">Service</label>
+          <select class="modal-select" id="bookService"></select>
+        </div>
+        <div class="modal-field">
+          <label class="modal-label">Date</label>
+          <input class="modal-input" id="bookDate" type="date" onchange="renderTimeSlots()">
+        </div>
+        <div class="modal-field">
+          <label class="modal-label">Available times</label>
+          <div class="slot-grid" id="slotGrid"></div>
+        </div>
+        <div class="modal-field">
+          <label class="modal-label">Vehicle</label>
+          <input class="modal-input" id="bookVehicle" placeholder="e.g. 2019 Honda Civic">
+        </div>
+        <div class="modal-field">
+          <label class="modal-label">Service address</label>
+          <input class="modal-input" id="bookAddress" placeholder="Where should we meet you?">
+        </div>
+        <div class="modal-field">
+          <label class="modal-label">Contact phone</label>
+          <input class="modal-input" id="bookPhone" placeholder="(555) 555-5555">
+        </div>
+        <div class="modal-field">
+          <label class="modal-label">Notes (optional)</label>
+          <input class="modal-input" id="bookNotes" placeholder="Anything we should know?">
+        </div>
+      </div>
+      <div style="padding:6px 20px max(16px, env(safe-area-inset-bottom));">
+        <div class="renew-btn" onclick="confirmBooking()">Confirm appointment →</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== APPOINTMENTS ===== -->
+  <div class="screen" id="screen-appointments">
+    <div class="top-header">
+      <div class="row"><div class="page-title">My Appointments</div><div class="avatar">MR</div></div>
+      <div class="page-sub">Upcoming and past service</div>
+    </div>
+    <div class="scroll-area">
+      <div class="sec-title">Upcoming</div>
+      <div id="appt-upcoming" style="padding-bottom:14px;"></div>
+      <div class="sec-title" style="margin-top:14px;">Past</div>
+      <div id="appt-past" style="padding-bottom:16px;"></div>
+    </div>
+  </div>
+
+  <!-- ===== REVIEWS ===== -->
+  <div class="screen" id="screen-reviews">
+    <div class="top-header">
+      <div class="row"><div class="page-title">Reviews</div><div class="avatar">MR</div></div>
+      <div class="page-sub" id="reviews-summary">4.9★ average · 214 reviews</div>
+    </div>
+    <div class="scroll-area">
+      <div style="padding:14px 20px 0;">
+        <div class="scan-bar" style="margin:0 0 14px;" onclick="openLeaveReviewModal()">
+          <i class="ti ti-star"></i>
+          <div class="scan-bar-text"><div class="t">Leave a review</div><div class="s">Tell others about your service</div></div>
+        </div>
+      </div>
+      <div id="all-reviews-list" style="padding-bottom:16px;"></div>
+    </div>
+  </div>
+
+  <!-- ===== SETTINGS ===== -->
+  <div class="screen" id="screen-settings">
+    <div class="top-header">
+      <div class="row"><div class="page-title">Settings</div></div>
+    </div>
+    <div class="scroll-area">
+      <div class="profile-box" onclick="openEditProfileModal()">
+        <div class="profile-avatar" id="profile-avatar">MR</div>
+        <div>
+          <div class="profile-name" id="profile-name">Marcus Rivera</div>
+          <div class="profile-email" id="profile-email">marcus@email.com</div>
+          <div class="profile-plan"><i class="ti ti-car" style="font-size:11px;"></i> 2019 Honda Civic</div>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <div class="settings-label">Notifications</div>
+        <div class="settings-group">
+          <div class="settings-row">
+            <div class="sr-icon sr-green"><i class="ti ti-calendar-event"></i></div>
+            <div class="sr-info"><div class="sr-label">Appointment reminders</div><div class="sr-sub">1 hour before arrival</div></div>
+            <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+          </div>
+          <div class="settings-row">
+            <div class="sr-icon sr-amber"><i class="ti ti-discount"></i></div>
+            <div class="sr-info"><div class="sr-label">Promotions & offers</div></div>
+            <div class="toggle" onclick="this.classList.toggle('on')"></div>
+          </div>
+        </div>
+
+        <div class="settings-label">Account</div>
+        <div class="settings-group">
+          <div class="settings-row" onclick="openEditProfileModal()">
+            <div class="sr-icon sr-green"><i class="ti ti-user"></i></div>
+            <div class="sr-info"><div class="sr-label">Edit profile</div></div>
+            <i class="ti ti-chevron-right sr-right"></i>
+          </div>
+          <div class="settings-row" onclick="openVehicleModal()">
+            <div class="sr-icon sr-blue"><i class="ti ti-car"></i></div>
+            <div class="sr-info"><div class="sr-label">My vehicle</div><div class="sr-sub" id="vehicle-sub">2019 Honda Civic</div></div>
+            <i class="ti ti-chevron-right sr-right"></i>
+          </div>
+          <div class="settings-row" onclick="openBillingModal()">
+            <div class="sr-icon sr-gray"><i class="ti ti-credit-card"></i></div>
+            <div class="sr-info"><div class="sr-label">Payment method</div><div class="sr-sub">Visa ···· 4242</div></div>
+            <i class="ti ti-chevron-right sr-right"></i>
+          </div>
+        </div>
+
+        <div class="settings-label">Business info</div>
+        <div class="settings-group">
+          <div class="settings-row" onclick="openHoursModal()">
+            <div class="sr-icon sr-gray"><i class="ti ti-clock"></i></div>
+            <div class="sr-info"><div class="sr-label">Hours & service area</div><div class="sr-sub">7 days/week · 25 mi radius</div></div>
+            <i class="ti ti-chevron-right sr-right"></i>
+          </div>
+        </div>
+
+        <div class="settings-label">More</div>
+        <div class="settings-group" style="margin-bottom:16px;">
+          <div class="settings-row" onclick="openHelpModal()">
+            <div class="sr-icon sr-gray"><i class="ti ti-help-circle"></i></div>
+            <div class="sr-info"><div class="sr-label">Help & support</div></div>
+            <i class="ti ti-chevron-right sr-right"></i>
+          </div>
+          <div class="settings-row" onclick="confirmSignOut()">
+            <div class="sr-icon sr-red"><i class="ti ti-logout"></i></div>
+            <div class="sr-info"><div class="sr-label" style="color:#F87171;">Sign out</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <div class="bottom-nav">
+    <div class="nav-item active" id="nav-home" onclick="showScreen('screen-home')"><i class="ti ti-home"></i><span>Home</span></div>
+    <div class="nav-item" id="nav-services" onclick="showScreen('screen-services')"><i class="ti ti-tools"></i><span>Services</span></div>
+    <div class="nav-item" id="nav-appointments" onclick="showScreen('screen-appointments')"><i class="ti ti-calendar"></i><span>Appointments</span></div>
+    <div class="nav-item" id="nav-reviews" onclick="showScreen('screen-reviews')"><i class="ti ti-star"></i><span>Reviews</span></div>
+    <div class="nav-item" id="nav-settings" onclick="showScreen('screen-settings')"><i class="ti ti-settings"></i><span>Settings</span></div>
+  </div>
+</div>
+
+<!-- APP MENU (3-dot) -->
+<div class="app-menu-overlay" id="appMenuOverlay" onclick="if(event.target===this) closeAppMenu()">
+  <div class="app-menu-sheet" id="appMenuSheet">
+    <div class="app-menu-item" onclick="closeAppMenu(); showScreen('screen-home');"><i class="ti ti-home"></i> Dashboard</div>
+    <div class="app-menu-item" onclick="closeAppMenu(); showScreen('screen-settings');"><i class="ti ti-settings"></i> Settings</div>
+    <div class="app-menu-item" onclick="closeAppMenu(); openHelpModal();"><i class="ti ti-help-circle"></i> Help & support</div>
+    <div class="app-menu-divider"></div>
+    <a class="app-menu-item back-link" id="backToSiteLink" href="../index.html"><i class="ti ti-arrow-left"></i> Back to Auto Care site</a>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay" onclick="if(event.target===this) closeModal()">
+  <div class="modal-sheet" id="modalSheet"></div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"><i class="ti ti-circle-check"></i><span id="toastMsg"></span></div>
+
+<!-- SIGN OUT OVERLAY -->
+<div class="signout-overlay" id="signoutOverlay">
+  <div class="scan-check"><i class="ti ti-check"></i></div>
+  <div class="modal-title">You've signed out</div>
+  <div class="msg">This is a demo build, so your data stays right here. Tap below to jump back in.</div>
+  <div class="modal-btn primary" style="max-width:220px;" onclick="signBackIn()">Sign back in</div>
+</div>
+
+<script src="app.js"></script>
+<script src="interactions.js"></script>
+</body>
+</html>
