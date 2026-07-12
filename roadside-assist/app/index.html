@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Roadside Warriors — We Come Do Battle For You</title>
+<meta name="description" content="Roadside Warriors — we come do battle for you. Verified providers, live ETA tracking, pay right in the app.">
+<meta name="theme-color" content="#FBFCFE">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.10.0/tabler-icons.min.css">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --accent: #2E7FB8;
+  --accent-bright: #4FA8E0;
+  --amber: #D98A0B;
+  --amber-bright: #FFC65C;
+  --bg: #FBFCFE;
+  --surface: #FFFFFF;
+  --surface2: #F1F6FA;
+  --border: rgba(22,35,46,0.08);
+  --text: #16232E;
+  --text-dim: rgba(22,35,46,0.55);
+  --text-faint: rgba(22,35,46,0.35);
+}
+html { scroll-behavior: smooth; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, system-ui, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background: rgba(251,252,254,0.9); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); }
+.nav-inner { max-width: 1100px; margin: 0 auto; padding: 0 24px; height: 64px; display: flex; align-items: center; justify-content: space-between; }
+.nav-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+.nav-logo-icon { width: 36px; height: 36px; background: linear-gradient(135deg, var(--accent-bright), var(--accent)); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+.nav-logo-text { font-size: 16px; font-weight: 800; color: var(--text); letter-spacing: -0.2px; }
+.nav-logo-text span { color: var(--accent); }
+.nav-links { display: flex; align-items: center; gap: 8px; }
+.nav-link { color: var(--text-dim); font-size: 14px; text-decoration: none; padding: 8px 14px; border-radius: 10px; }
+.nav-link:hover { color: var(--text); background: rgba(22,35,46,0.05); }
+.nav-cta { background: linear-gradient(135deg, var(--amber-bright), var(--amber)); color: #3B2200; font-size: 13.5px; font-weight: 700; padding: 9px 20px; border-radius: 10px; text-decoration: none; box-shadow: 0 4px 14px rgba(217,138,11,0.3); }
+.nav-mobile-menu { display: none; background: none; border: none; color: var(--text); font-size: 24px; cursor: pointer; }
+@media (max-width: 640px) { .nav-links { display: none; } .nav-mobile-menu { display: block; } }
+.nav-links.mobile-open { display: flex; position: absolute; top: 64px; left: 0; right: 0; background: var(--bg); flex-direction: column; padding: 16px 24px; border-bottom: 1px solid var(--border); }
+
+.hero { min-height: 88vh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 120px 24px 60px; position: relative; overflow: hidden; }
+.hero-glow { position: absolute; top: 10%; left: 50%; transform: translateX(-50%); width: 700px; height: 700px; background: radial-gradient(circle, rgba(79,168,224,0.12) 0%, transparent 70%); pointer-events: none; }
+.hero-badge { display: inline-flex; align-items: center; gap: 7px; background: rgba(217,138,11,0.1); border: 1px solid rgba(217,138,11,0.25); border-radius: 20px; padding: 6px 14px; font-size: 12.5px; color: var(--amber); font-weight: 700; margin-bottom: 28px; }
+.hero h1 { font-size: clamp(34px, 6vw, 64px); font-weight: 900; line-height: 1.08; letter-spacing: -1.5px; margin-bottom: 20px; max-width: 800px; color: var(--text); }
+.hero h1 .highlight { color: var(--accent); }
+.hero p { font-size: clamp(16px, 2vw, 19px); color: var(--text-dim); max-width: 560px; line-height: 1.6; margin-bottom: 36px; }
+.hero-btns { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin-bottom: 54px; }
+.btn-primary { background: linear-gradient(135deg, var(--amber-bright), var(--amber)); color: #3B2200; font-weight: 700; font-size: 15px; padding: 14px 28px; border-radius: 12px; text-decoration: none; box-shadow: 0 8px 24px rgba(217,138,11,0.32); }
+.btn-secondary { background: var(--surface); border: 1px solid var(--border); color: var(--text); font-weight: 600; font-size: 15px; padding: 14px 28px; border-radius: 12px; text-decoration: none; box-shadow: 0 2px 8px rgba(22,35,46,0.04); }
+.hero-stats { display: flex; gap: 36px; flex-wrap: wrap; justify-content: center; }
+.hero-stat { text-align: center; }
+.hero-stat-num { font-size: 26px; font-weight: 800; color: var(--accent); }
+.hero-stat-label { font-size: 12px; color: var(--text-faint); margin-top: 3px; }
+
+section { max-width: 1100px; margin: 0 auto; padding: 90px 24px; }
+.sec-label { color: var(--amber); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; text-align: center; margin-bottom: 10px; }
+.sec-title { font-size: clamp(26px, 4vw, 40px); font-weight: 800; text-align: center; letter-spacing: -0.5px; margin-bottom: 14px; }
+.sec-sub { text-align: center; color: var(--text-dim); max-width: 520px; margin: 0 auto 50px; font-size: 15.5px; line-height: 1.6; }
+
+.split-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 22px; }
+.split-card { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 30px; box-shadow: 0 4px 20px rgba(22,35,46,0.04); }
+.split-card .icon { width: 52px; height: 52px; border-radius: 15px; display: flex; align-items: center; justify-content: center; font-size: 24px; margin-bottom: 18px; }
+.split-card.customer .icon { background: rgba(79,168,224,0.14); }
+.split-card.provider .icon { background: rgba(217,138,11,0.14); }
+.split-card h3 { font-size: 19px; font-weight: 800; margin-bottom: 10px; }
+.split-card p { color: var(--text-dim); font-size: 14px; line-height: 1.6; margin-bottom: 18px; }
+.split-card ul { list-style: none; display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
+.split-card li { font-size: 13.5px; color: var(--text-dim); display: flex; align-items: center; gap: 8px; }
+.split-card li i { color: var(--accent); }
+.split-card.provider li i { color: var(--amber); }
+
+.service-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+.service-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 22px; text-align: center; box-shadow: 0 2px 12px rgba(22,35,46,0.03); }
+.service-card .emoji { font-size: 30px; margin-bottom: 10px; }
+.service-card h4 { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+.service-card .price { color: var(--accent); font-weight: 700; font-size: 13.5px; }
+
+.steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 24px; }
+.step { text-align: center; }
+.step-num { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, var(--accent-bright), var(--accent)); color: #fff; font-weight: 800; display: flex; align-items: center; justify-content: center; margin: 0 auto 14px; }
+.step h4 { font-size: 15.5px; font-weight: 700; margin-bottom: 6px; }
+.step p { color: var(--text-dim); font-size: 13.5px; line-height: 1.5; }
+
+.cta-band { background: linear-gradient(135deg, rgba(79,168,224,0.12), rgba(217,138,11,0.08)); border: 1px solid rgba(79,168,224,0.25); border-radius: 24px; padding: 60px 40px; text-align: center; }
+.cta-band h2 { font-size: clamp(24px, 3.5vw, 34px); font-weight: 800; margin-bottom: 14px; }
+.cta-band p { color: var(--text-dim); margin-bottom: 28px; }
+
+footer { border-top: 1px solid var(--border); padding: 40px 24px; text-align: center; color: var(--text-faint); font-size: 13px; }
+footer a { color: var(--text-dim); text-decoration: none; margin: 0 10px; }
+
+.disclaimer { background: var(--surface2); border: 1px solid var(--border); border-radius: 14px; padding: 16px 20px; font-size: 12.5px; color: var(--text-dim); line-height: 1.6; max-width: 700px; margin: 0 auto; }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a href="#" class="nav-logo">
+      <div class="nav-logo-icon">⚔️</div>
+      <div class="nav-logo-text">KEON'S CASTLE <span>ROADSIDE WARRIORS</span></div>
+    </a>
+    <div class="nav-links" id="navLinks">
+      <a href="#services" class="nav-link">Services</a>
+      <a href="#providers" class="nav-link">Become a provider</a>
+      <a href="#how" class="nav-link">How it works</a>
+      <a href="app/index.html" class="nav-cta">Get Help Now →</a>
+    </div>
+    <button class="nav-mobile-menu" onclick="document.getElementById('navLinks').classList.toggle('mobile-open')"><i class="ti ti-menu-2"></i></button>
+  </div>
+</nav>
+
+<div class="hero">
+  <div class="hero-glow"></div>
+  <div class="hero-badge"><i class="ti ti-shield-check" style="font-size:14px"></i> Verified providers only</div>
+  <h1>Stuck on the road?<br><span class="highlight">Help is closer than you think.</span></h1>
+  <p>Roadside Warriors connects you with a verified nearby provider in minutes — track your ETA live and pay right in the app, no calling around required.</p>
+  <div class="hero-btns">
+    <a href="app/index.html" class="btn-primary">Get help now →</a>
+    <a href="#providers" class="btn-secondary">Become a provider</a>
+  </div>
+  <div class="hero-stats">
+    <div class="hero-stat"><div class="hero-stat-num">4.9★</div><div class="hero-stat-label">Average rating</div></div>
+    <div class="hero-stat"><div class="hero-stat-num">100%</div><div class="hero-stat-label">Verified providers</div></div>
+    <div class="hero-stat"><div class="hero-stat-num">24/7</div><div class="hero-stat-label">Availability</div></div>
+    <div class="hero-stat"><div class="hero-stat-num">5 min</div><div class="hero-stat-label">Avg. match time</div></div>
+  </div>
+</div>
+
+<section id="services">
+  <div class="sec-label">Services</div>
+  <div class="sec-title">Whatever happened, we've got it</div>
+  <div class="sec-sub">Every request is tracked from the moment you tap "Get Help" to the moment you're back on the road.</div>
+  <div class="service-grid">
+    <div class="service-card"><div class="emoji">🔋</div><h4>Jumpstart</h4><div class="price">From $45</div></div>
+    <div class="service-card"><div class="emoji">🛞</div><h4>Flat Tire Change</h4><div class="price">From $55</div></div>
+    <div class="service-card"><div class="emoji">🔧</div><h4>Tire Plug / Repair</h4><div class="price">From $40</div></div>
+    <div class="service-card"><div class="emoji">⛽</div><h4>Fuel Delivery (up to 2 gal)</h4><div class="price">From $40</div></div>
+  </div>
+  <div class="disclaimer" style="margin-top:24px;">
+    <strong>How pricing works:</strong> A $50 upfront dispatch fee applies any time a provider comes out to you — this covers their trip regardless of what's needed. The service charge above is billed separately once the job is complete.
+  </div>
+</section>
+
+<section id="providers">
+  <div class="sec-label">Two sides, one app</div>
+  <div class="sec-title">Built for drivers and providers</div>
+  <div class="split-grid">
+    <div class="split-card customer">
+      <div class="icon">🚗</div>
+      <h3>Need help?</h3>
+      <p>Request a service in a few taps and watch your provider's ETA count down in real time.</p>
+      <ul>
+        <li><i class="ti ti-check"></i> Pick your service & vehicle from simple dropdowns</li>
+        <li><i class="ti ti-check"></i> Live ETA and status updates</li>
+        <li><i class="ti ti-check"></i> Pay securely, right in the app</li>
+      </ul>
+      <a href="app/index.html" class="btn-primary" style="display:inline-block;">Request help →</a>
+    </div>
+    <div class="split-card provider">
+      <div class="icon">🔧</div>
+      <h3>Keep 95% of what you earn</h3>
+      <p>Get verified once, then go online whenever you want. We only keep 5% — the rest is yours, every job.</p>
+      <ul>
+        <li><i class="ti ti-check"></i> 95% earnings on every job, no exceptions</li>
+        <li><i class="ti ti-check"></i> Quick selfie + license verification</li>
+        <li><i class="ti ti-check"></i> Any car, mini-van, SUV, or truck qualifies</li>
+        <li><i class="ti ti-check"></i> Paid weekly, every Thursday</li>
+      </ul>
+      <a href="app/index.html" class="btn-secondary" style="display:inline-block;">Become a provider →</a>
+    </div>
+  </div>
+</section>
+
+<section id="how">
+  <div class="sec-label">Process</div>
+  <div class="sec-title">From stuck to solved in 3 steps</div>
+  <div class="steps">
+    <div class="step"><div class="step-num">1</div><h4>Request help</h4><p>Tell us what happened and where you are.</p></div>
+    <div class="step"><div class="step-num">2</div><h4>Track your provider</h4><p>See your live ETA and status the whole way.</p></div>
+    <div class="step"><div class="step-num">3</div><h4>Pay & get back on the road</h4><p>Pay right in the app once the job's done.</p></div>
+  </div>
+</section>
+
+<section>
+  <div class="cta-band">
+    <h2>Ready when you need it</h2>
+    <p>Whether you're stranded or looking to earn, the app is one tap away.</p>
+    <a href="app/index.html" class="btn-primary">Open the app →</a>
+  </div>
+</section>
+
+<section style="padding-top:0;">
+  <div class="disclaimer">
+    <strong>About this build:</strong> This is a fully designed, fully working prototype of the entire request → track → pay flow. Payment processing shown here is a demo checkout (no real charges); connecting real payments, real identity verification, and real live GPS tracking between two separate devices requires a small backend (e.g. Stripe, an identity verification service, and a real-time database) — happy to help you scope that out when you're ready to go live.
+  </div>
+</section>
+
+<footer>
+  <div style="margin-bottom:10px;">© 2026 Keon's Castle LLC — Roadside Warriors</div>
+  <a href="../index.html">Keon's Castle Home</a>
+  <a href="app/index.html">Get Help / Provider App</a>
+</footer>
+
+</body>
+</html>

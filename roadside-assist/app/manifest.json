@@ -1,0 +1,13 @@
+{
+  "name": "Roadside Warriors",
+  "short_name": "Warriors",
+  "description": "Connect with a verified roadside assistance provider and track your ETA live.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#FBFCFE",
+  "theme_color": "#FBFCFE",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}
