@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<title>LifeAdmin — Helping life move forward</title>
+<meta name="description" content="Track every deadline in your adult life: registrations, passports, prescriptions, insurance, and more. Scan a document and let AI find the date.">
+
+<!-- PWA -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0D0D0D">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="LifeAdmin">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512.png">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.10.0/tabler-icons.min.css">
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- INSTALL BANNER -->
+<div class="install-banner" id="installBanner">
+  <div class="install-banner-inner">
+    <svg width="28" height="34" viewBox="0 0 130 160" fill="none" xmlns="http://www.w3.org/2000/svg" class="install-logo">
+      <defs><linearGradient id="lgBanner" x1="65" y1="0" x2="65" y2="160" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#C2F26B"/><stop offset="100%" stop-color="#5BAA22"/></linearGradient></defs>
+      <rect x="6" y="6" width="118" height="148" rx="44" stroke="url(#lgBanner)" stroke-width="7" fill="none"/>
+      <line x1="65" y1="88" x2="65" y2="118" stroke="url(#lgBanner)" stroke-width="6.5" stroke-linecap="round"/>
+      <circle cx="65" cy="44" r="18" stroke="url(#lgBanner)" stroke-width="6" fill="none"/>
+      <circle cx="46" cy="54" r="16" stroke="url(#lgBanner)" stroke-width="6" fill="none"/>
+      <circle cx="84" cy="54" r="16" stroke="url(#lgBanner)" stroke-width="6" fill="none"/>
+    </svg>
+    <div class="install-text">
+      <div class="install-title">Install LifeAdmin</div>
+      <div class="install-sub">Add to your home screen for the full app experience</div>
+    </div>
+    <button class="install-btn" id="installBtn">Install</button>
+    <button class="install-dismiss" id="installDismiss" aria-label="Dismiss">✕</button>
+  </div>
+</div>
+
+<!-- PREVIEW BANNER (shown to guests browsing before they sign up) -->
+<div class="install-banner" id="previewBanner">
+  <div class="install-banner-inner">
+    <div class="install-text">
+      <div class="install-title">You're viewing a preview</div>
+      <div class="install-sub">Create a free account to save your own data</div>
+    </div>
+    <button class="install-btn" onclick="openAuthGate('signup')">Start free trial</button>
+    <button class="install-dismiss" onclick="openAuthGate('signin')" style="text-decoration:underline;font-size:12px;">Sign in</button>
+  </div>
+</div>
+
+<!-- AUTH GATE -->
+<div class="signout-overlay" id="authGate">
+  <button class="install-dismiss" id="authCloseBtn" onclick="closeAuthGate()" aria-label="Close" style="position:absolute;top:max(16px,env(safe-area-inset-top));right:16px;font-size:22px;">✕</button>
+  <svg width="52" height="64" viewBox="0 0 130 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <defs><linearGradient id="lgAuth" x1="65" y1="0" x2="65" y2="160" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#C2F26B"/><stop offset="100%" stop-color="#5BAA22"/></linearGradient></defs>
+    <rect x="6" y="6" width="118" height="148" rx="44" stroke="url(#lgAuth)" stroke-width="7" fill="none"/>
+    <line x1="65" y1="88" x2="65" y2="118" stroke="url(#lgAuth)" stroke-width="6.5" stroke-linecap="round"/>
+    <circle cx="65" cy="44" r="18" stroke="url(#lgAuth)" stroke-width="6" fill="none"/>
+    <circle cx="46" cy="54" r="16" stroke="url(#lgAuth)" stroke-width="6" fill="none"/>
+    <circle cx="84" cy="54" r="16" stroke="url(#lgAuth)" stroke-width="6" fill="none"/>
+  </svg>
+  <div class="modal-title" id="authTitle">Welcome to LifeAdmin</div>
+  <div class="msg" id="authSubtitle">Sign in to track your documents and deadlines.</div>
+  <div style="width:100%;max-width:300px;display:flex;flex-direction:column;gap:10px;text-align:left;">
+    <input class="modal-input" id="authEmail" type="email" placeholder="Email" autocomplete="email">
+    <input class="modal-input" id="authPassword" type="password" placeholder="Password (6+ characters)" autocomplete="current-password">
+    <div id="authError" style="color:#F87171;font-size:12.5px;display:none;"></div>
+    <div id="authInfo" style="color:rgba(255,255,255,0.5);font-size:12.5px;display:none;"></div>
+    <button class="modal-btn primary" id="authSubmitBtn" onclick="handleAuthSubmit()">Sign in</button>
+    <button class="modal-btn secondary" id="authToggleBtn" onclick="toggleAuthMode()">New here? Create an account</button>
+  </div>
+</div>
+
+<div class="app" id="app">
+  <div class="status-bar">
+    <span id="clock">9:41</span>
+    <span class="status-icons">●●●</span>
+    <button class="app-menu-btn" onclick="openAppMenu()" aria-label="Menu"><i class="ti ti-dots-vertical"></i></button>
+  </div>
+
+  <!-- ===== DASHBOARD ===== -->
+  <div class="screen active" id="screen-dashboard">
+    <div class="top-header">
+      <div class="row">
+        <div class="brand-row">
+          <svg width="44" height="54" viewBox="0 0 130 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <defs><linearGradient id="lg2" x1="65" y1="0" x2="65" y2="160" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#C2F26B"/><stop offset="100%" stop-color="#5BAA22"/></linearGradient></defs>
+            <rect x="6" y="6" width="118" height="148" rx="44" stroke="url(#lg2)" stroke-width="7" fill="none"/>
+            <line x1="65" y1="88" x2="65" y2="118" stroke="url(#lg2)" stroke-width="6.5" stroke-linecap="round"/>
+            <line x1="65" y1="95" x2="40" y2="78" stroke="url(#lg2)" stroke-width="5.5" stroke-linecap="round"/>
+            <line x1="65" y1="95" x2="90" y2="78" stroke="url(#lg2)" stroke-width="5.5" stroke-linecap="round"/>
+            <line x1="65" y1="88" x2="65" y2="62" stroke="url(#lg2)" stroke-width="5.5" stroke-linecap="round"/>
+            <circle cx="65" cy="44" r="18" stroke="url(#lg2)" stroke-width="6" fill="none"/>
+            <circle cx="46" cy="54" r="16" stroke="url(#lg2)" stroke-width="6" fill="none"/>
+            <circle cx="84" cy="54" r="16" stroke="url(#lg2)" stroke-width="6" fill="none"/>
+            <circle cx="36" cy="70" r="14" stroke="url(#lg2)" stroke-width="6" fill="none"/>
+            <circle cx="94" cy="70" r="14" stroke="url(#lg2)" stroke-width="6" fill="none"/>
+            <circle cx="50" cy="80" r="13" stroke="url(#lg2)" stroke-width="6" fill="none"/>
+            <circle cx="80" cy="80" r="13" stroke="url(#lg2)" stroke-width="6" fill="none"/>
+            <circle cx="65" cy="44" r="11" fill="#0D0D0D"/><circle cx="46" cy="54" r="9.5" fill="#0D0D0D"/><circle cx="84" cy="54" r="9.5" fill="#0D0D0D"/><circle cx="36" cy="70" r="7.5" fill="#0D0D0D"/><circle cx="94" cy="70" r="7.5" fill="#0D0D0D"/><circle cx="50" cy="80" r="6.5" fill="#0D0D0D"/><circle cx="80" cy="80" r="6.5" fill="#0D0D0D"/>
+            <line x1="65" y1="62" x2="55" y2="52" stroke="url(#lg2)" stroke-width="4" stroke-linecap="round"/>
+            <line x1="65" y1="62" x2="75" y2="52" stroke="url(#lg2)" stroke-width="4" stroke-linecap="round"/>
+            <line x1="65" y1="70" x2="52" y2="64" stroke="url(#lg2)" stroke-width="4" stroke-linecap="round"/>
+            <line x1="65" y1="70" x2="78" y2="64" stroke="url(#lg2)" stroke-width="4" stroke-linecap="round"/>
+            <path d="M22 118 Q40 110 65 118 Q90 126 108 118" stroke="url(#lg2)" stroke-width="5.5" stroke-linecap="round" fill="none"/>
+            <path d="M30 128 Q47 120 65 128 Q83 136 100 128" stroke="url(#lg2)" stroke-width="5" stroke-linecap="round" fill="none"/>
+            <path d="M38 138 Q51 131 65 138 Q79 145 92 138" stroke="url(#lg2)" stroke-width="4.5" stroke-linecap="round" fill="none"/>
+            <path d="M30 138 Q22 130 28 124 Q36 132 30 138Z" stroke="url(#lg2)" stroke-width="3.5" fill="none"/>
+            <path d="M100 138 Q108 130 102 124 Q94 132 100 138Z" stroke="url(#lg2)" stroke-width="3.5" fill="none"/>
+          </svg>
+          <div>
+            <div class="brand-name">LifeAdmin</div>
+            <div class="brand-tagline">Helping life move forward</div>
+          </div>
+        </div>
+        <div class="avatar">MR</div>
+      </div>
+      <div class="header-note">3 documents need attention</div>
+    </div>
+    <div class="scroll-area">
+      <div class="stat-row">
+        <div class="stat red"><div class="stat-num">3</div><div class="stat-label">Urgent</div></div>
+        <div class="stat amber"><div class="stat-num">5</div><div class="stat-label">Due soon</div></div>
+        <div class="stat green"><div class="stat-num">14</div><div class="stat-label">All clear</div></div>
+      </div>
+      <div class="scan-bar" onclick="openScanModal()">
+        <i class="ti ti-scan"></i>
+        <div class="scan-bar-text"><div class="t">Scan a document</div><div class="s">AI extracts dates automatically</div></div>
+        <i class="ti ti-chevron-right arr"></i>
+      </div>
+      <div class="sec-title">Upcoming deadlines</div>
+      <div class="doc-list" style="padding-bottom:16px;" id="dashboard-doc-list">
+        <div class="doc-card" onclick="showDetail('vehicle')"><div class="doc-icon di-red">🚗</div><div class="doc-info"><div class="doc-name">Vehicle Registration</div><div class="doc-sub">DMV · California</div></div><div class="badge b-red">5 days</div></div>
+        <div class="doc-card" onclick="showDetail('passport')"><div class="doc-icon di-red">🛂</div><div class="doc-info"><div class="doc-name">Passport</div><div class="doc-sub">US State Dept</div></div><div class="badge b-red">18 days</div></div>
+        <div class="doc-card" onclick="showDetail('rx')"><div class="doc-icon di-amber">💊</div><div class="doc-info"><div class="doc-name">Prescription Refill</div><div class="doc-sub">CVS Pharmacy</div></div><div class="badge b-amber">29 days</div></div>
+        <div class="doc-card" onclick="showDetail('insurance')"><div class="doc-icon di-amber">🛡️</div><div class="doc-info"><div class="doc-name">Home Insurance</div><div class="doc-sub">State Farm</div></div><div class="badge b-amber">47 days</div></div>
+        <div class="doc-card" onclick="showDetail('license')"><div class="doc-icon di-green">🪪</div><div class="doc-info"><div class="doc-name">Driver's License</div><div class="doc-sub">DMV · California</div></div><div class="badge b-green">8 mo</div></div>
+        <div class="doc-card" onclick="showDetail('pet')"><div class="doc-icon di-purple">🐕</div><div class="doc-info"><div class="doc-name">Pet Vaccinations</div><div class="doc-sub">Max · Rabies</div></div><div class="badge b-green">11 mo</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== DOCUMENTS ===== -->
+  <div class="screen" id="screen-documents">
+    <div class="top-header">
+      <div class="row"><div class="page-title">Documents</div><div class="avatar">MR</div></div>
+      <div class="page-sub">22 documents · 3 urgent</div>
+    </div>
+    <div class="filter-row">
+      <div class="chip active" data-cat="All" onclick="setFilter(this)">All</div>
+      <div class="chip" data-cat="Vehicle" onclick="setFilter(this)">Vehicle</div>
+      <div class="chip" data-cat="Travel" onclick="setFilter(this)">Travel</div>
+      <div class="chip" data-cat="Health" onclick="setFilter(this)">Health</div>
+      <div class="chip" data-cat="Insurance" onclick="setFilter(this)">Insurance</div>
+      <div class="chip" data-cat="Pets" onclick="setFilter(this)">Pets</div>
+      <div class="chip" data-cat="HOA" onclick="setFilter(this)">HOA</div>
+    </div>
+    <div class="scroll-area">
+      <div class="sec-title" data-group="urgent">Urgent — act now</div>
+      <div class="doc-list" data-group="urgent">
+        <div class="doc-card" data-cat="Vehicle" onclick="showDetail('vehicle')"><div class="doc-icon di-red">🚗</div><div class="doc-info"><div class="doc-name">Vehicle Registration</div><div class="doc-sub">DMV · California · Expires Jul 4</div></div><div class="badge b-red">5 days</div></div>
+        <div class="doc-card" data-cat="Travel" onclick="showDetail('passport')"><div class="doc-icon di-red">🛂</div><div class="doc-info"><div class="doc-name">Passport</div><div class="doc-sub">US State Dept · Expires Jul 17</div></div><div class="badge b-red">18 days</div></div>
+        <div class="doc-card" data-cat="HOA" onclick="showDetail('hoa')"><div class="doc-icon di-red">💳</div><div class="doc-info"><div class="doc-name">HOA Dues</div><div class="doc-sub">Riverside HOA · Q3 due</div></div><div class="badge b-red">22 days</div></div>
+      </div>
+      <div class="sec-title" style="margin-top:14px;" data-group="soon">Due soon</div>
+      <div class="doc-list" data-group="soon">
+        <div class="doc-card" data-cat="Health" onclick="showDetail('rx')"><div class="doc-icon di-amber">💊</div><div class="doc-info"><div class="doc-name">Prescription Refill</div><div class="doc-sub">CVS Pharmacy</div></div><div class="badge b-amber">29 days</div></div>
+        <div class="doc-card" data-cat="Insurance" onclick="showDetail('insurance')"><div class="doc-icon di-amber">🛡️</div><div class="doc-info"><div class="doc-name">Home Insurance</div><div class="doc-sub">State Farm · Renewal</div></div><div class="badge b-amber">47 days</div></div>
+        <div class="doc-card" data-cat="Other" onclick="showDetail('warranty')"><div class="doc-icon di-amber">🔧</div><div class="doc-info"><div class="doc-name">Appliance Warranty</div><div class="doc-sub">Samsung Fridge</div></div><div class="badge b-amber">52 days</div></div>
+        <div class="doc-card" data-cat="Other" onclick="showDetail('mortgage')"><div class="doc-icon di-blue">🏠</div><div class="doc-info"><div class="doc-name">Mortgage Review</div><div class="doc-sub">First National Bank</div></div><div class="badge b-amber">61 days</div></div>
+      </div>
+      <div class="sec-title" style="margin-top:14px;" data-group="clear">All clear</div>
+      <div class="doc-list" style="padding-bottom:16px;" data-group="clear">
+        <div class="doc-card" data-cat="Vehicle" onclick="showDetail('license')"><div class="doc-icon di-green">🪪</div><div class="doc-info"><div class="doc-name">Driver's License</div><div class="doc-sub">DMV · California</div></div><div class="badge b-green">8 mo</div></div>
+        <div class="doc-card" data-cat="Pets" onclick="showDetail('pet')"><div class="doc-icon di-purple">🐕</div><div class="doc-info"><div class="doc-name">Pet Vaccinations</div><div class="doc-sub">Max · Rabies</div></div><div class="badge b-green">11 mo</div></div>
+        <div class="doc-card" data-cat="Insurance" onclick="showDetail('dental')"><div class="doc-icon di-green">🦷</div><div class="doc-info"><div class="doc-name">Dental Insurance</div><div class="doc-sub">Aetna · Annual</div></div><div class="badge b-green">14 mo</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== DOCUMENT DETAIL ===== -->
+  <div class="screen" id="screen-detail">
+    <div class="detail-header">
+      <div class="back-btn" onclick="goBack()"><i class="ti ti-arrow-left"></i></div>
+      <div class="detail-title" id="detail-title">Document</div>
+    </div>
+    <div class="scroll-area">
+      <div class="detail-hero">
+        <div class="detail-big-icon di-red" id="detail-icon"><span id="detail-emoji">🚗</span></div>
+        <div class="detail-doc-name" id="detail-name">Vehicle Registration</div>
+        <div class="detail-doc-sub" id="detail-sub">DMV · California</div>
+        <div class="detail-days-badge"><div class="detail-days-inner b-red" id="detail-badge">Expires in 5 days — Jul 4, 2026</div></div>
+      </div>
+      <div class="detail-info-grid">
+        <div class="detail-info-box"><div class="dib-label">Category</div><div class="dib-val" id="di-cat">Vehicle</div></div>
+        <div class="detail-info-box"><div class="dib-label">Reminder set</div><div class="dib-val">90 · 30 · 7 days</div></div>
+        <div class="detail-info-box"><div class="dib-label">Issued</div><div class="dib-val" id="di-issued">Jul 4, 2025</div></div>
+        <div class="detail-info-box"><div class="dib-label">Owner</div><div class="dib-val" id="di-owner">Marcus R.</div></div>
+      </div>
+      <div class="sec-title">Renewal checklist</div>
+      <div class="checklist" id="checklist"></div>
+      <div class="renew-btn" id="renew-btn" onclick="startRenewal()">Start renewal →</div>
+    </div>
+  </div>
+
+  <!-- ===== FAMILY ===== -->
+  <div class="screen" id="screen-family">
+    <div class="top-header">
+      <div class="row"><div class="page-title">Family</div><div class="avatar">MR</div></div>
+      <div class="page-sub">4 members · 22 documents tracked</div>
+    </div>
+    <div class="scroll-area">
+      <div class="sec-title">Members</div>
+      <div class="family-grid" style="padding-bottom:14px;" id="family-grid">
+        <div class="family-card" onclick="openMemberModal('Marcus','You · Account owner','9 documents')">
+          <div class="fam-avatar fa-green">MR</div>
+          <div class="fam-name">Marcus</div>
+          <div class="fam-role">You · Account owner</div>
+          <div class="fam-docs">9 documents</div>
+        </div>
+        <div class="family-card" onclick="openMemberModal('Jordan','Spouse','7 documents')">
+          <div class="fam-avatar fa-blue">JR</div>
+          <div class="fam-name">Jordan</div>
+          <div class="fam-role">Spouse</div>
+          <div class="fam-docs">7 documents</div>
+        </div>
+        <div class="family-card" onclick="openMemberModal('Lily','Child · Age 8','3 documents')">
+          <div class="fam-avatar fa-purple">LR</div>
+          <div class="fam-name">Lily</div>
+          <div class="fam-role">Child · Age 8</div>
+          <div class="fam-docs">3 documents</div>
+        </div>
+        <div class="family-card" onclick="openMemberModal('Dad','Parent','3 documents')">
+          <div class="fam-avatar fa-amber">DR</div>
+          <div class="fam-name">Dad</div>
+          <div class="fam-role">Parent</div>
+          <div class="fam-docs">3 documents</div>
+        </div>
+        <div class="add-member" onclick="openAddMemberModal()">
+          <i class="ti ti-user-plus"></i>
+          <span>Add member</span>
+        </div>
+      </div>
+      <div class="sec-title">Upcoming for family</div>
+      <div class="doc-list" style="padding-bottom:16px;">
+        <div class="doc-card" onclick="showDetail('lily_passport')"><div class="doc-icon di-red">🛂</div><div class="doc-info"><div class="doc-name">Lily's Passport</div><div class="doc-sub">Child · Expires soon</div></div><div class="badge b-red">12 days</div></div>
+        <div class="doc-card" onclick="showDetail('jordan_insurance')"><div class="doc-icon di-amber">🏥</div><div class="doc-info"><div class="doc-name">Jordan's Health Insurance</div><div class="doc-sub">Open enrollment</div></div><div class="badge b-amber">44 days</div></div>
+        <div class="doc-card" onclick="showDetail('dad_rx')"><div class="doc-icon di-amber">💊</div><div class="doc-info"><div class="doc-name">Dad's Prescription</div><div class="doc-sub">Metformin · Refill</div></div><div class="badge b-amber">60 days</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== ALERTS ===== -->
+  <div class="screen" id="screen-alerts">
+    <div class="top-header">
+      <div class="row"><div class="page-title">Alerts</div><div class="badge b-red" style="font-size:12px;padding:4px 10px;">3 new</div></div>
+      <div class="page-sub">Your reminders and notifications</div>
+    </div>
+    <div class="scroll-area">
+      <div class="sec-title">Today</div>
+      <div class="alert-card urgent">
+        <div class="alert-icon ai-red">🚗</div>
+        <div class="alert-body">
+          <div class="alert-title">Vehicle Registration expires in 5 days</div>
+          <div class="alert-sub">DMV California · Jul 4, 2026. Renew online or in person.</div>
+          <div class="alert-time">Just now</div>
+        </div>
+      </div>
+      <div class="alert-card urgent">
+        <div class="alert-icon ai-red">🛂</div>
+        <div class="alert-body">
+          <div class="alert-title">Lily's Passport expires in 12 days</div>
+          <div class="alert-sub">Expedited renewal required. Processing takes 5–7 weeks.</div>
+          <div class="alert-time">2 hours ago</div>
+        </div>
+      </div>
+      <div class="sec-title" style="margin-top:10px;">This week</div>
+      <div class="alert-card warn">
+        <div class="alert-icon ai-amber">💊</div>
+        <div class="alert-body">
+          <div class="alert-title">Prescription refill due in 29 days</div>
+          <div class="alert-sub">CVS Pharmacy · Call or refill via app to avoid gap.</div>
+          <div class="alert-time">Yesterday</div>
+        </div>
+      </div>
+      <div class="alert-card warn">
+        <div class="alert-icon ai-amber">🛡️</div>
+        <div class="alert-body">
+          <div class="alert-title">Home Insurance renewal in 47 days</div>
+          <div class="alert-sub">State Farm · Review your coverage before renewing.</div>
+          <div class="alert-time">3 days ago</div>
+        </div>
+      </div>
+      <div class="sec-title" style="margin-top:10px;">Earlier</div>
+      <div class="alert-card info">
+        <div class="alert-icon ai-green">✅</div>
+        <div class="alert-body">
+          <div class="alert-title">Driver's License scanned & saved</div>
+          <div class="alert-sub">Expiry date extracted: Mar 14, 2027. All clear.</div>
+          <div class="alert-time">1 week ago</div>
+        </div>
+      </div>
+      <div class="alert-card info" style="margin-bottom:16px;">
+        <div class="alert-icon ai-green">🐕</div>
+        <div class="alert-body">
+          <div class="alert-title">Max's vaccinations up to date</div>
+          <div class="alert-sub">Next rabies booster: May 2027.</div>
+          <div class="alert-time">2 weeks ago</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SETTINGS ===== -->
+  <div class="screen" id="screen-settings">
+    <div class="top-header">
+      <div class="row"><div class="page-title">Settings</div></div>
+    </div>
+    <div class="scroll-area">
+      <div class="profile-box" onclick="openEditProfileModal()">
+        <div class="profile-avatar" id="profile-avatar">MR</div>
+        <div>
+          <div class="profile-name" id="profile-name">Marcus Rivera</div>
+          <div class="profile-email" id="profile-email">marcus@email.com</div>
+          <div class="profile-plan"><i class="ti ti-star" style="font-size:11px;"></i> <span id="profile-plan-text">Premium plan</span></div>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <div class="settings-label">Reminders</div>
+        <div class="settings-group">
+          <div class="settings-row">
+            <div class="sr-icon sr-green"><i class="ti ti-bell"></i></div>
+            <div class="sr-info"><div class="sr-label">Push notifications</div><div class="sr-sub">90, 30 and 7 days before</div></div>
+            <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+          </div>
+          <div class="settings-row">
+            <div class="sr-icon sr-blue"><i class="ti ti-mail"></i></div>
+            <div class="sr-info"><div class="sr-label">Email reminders</div><div class="sr-sub">Weekly digest</div></div>
+            <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+          </div>
+          <div class="settings-row">
+            <div class="sr-icon sr-amber"><i class="ti ti-device-mobile"></i></div>
+            <div class="sr-info"><div class="sr-label">SMS alerts</div><div class="sr-sub">Urgent items only</div></div>
+            <div class="toggle" onclick="this.classList.toggle('on')"></div>
+          </div>
+        </div>
+
+        <div class="settings-label">Account</div>
+        <div class="settings-group">
+          <div class="settings-row" onclick="openEditProfileModal()">
+            <div class="sr-icon sr-green"><i class="ti ti-user"></i></div>
+            <div class="sr-info"><div class="sr-label">Edit profile</div></div>
+            <i class="ti ti-chevron-right sr-right"></i>
+          </div>
+          <div class="settings-row" onclick="showScreen('screen-family')">
+            <div class="sr-icon sr-purple"><i class="ti ti-users"></i></div>
+            <div class="sr-info"><div class="sr-label">Manage family</div><div class="sr-sub">4 members</div></div>
+            <i class="ti ti-chevron-right sr-right"></i>
+          </div>
+          <div class="settings-row">
+            <div class="sr-icon sr-blue"><i class="ti ti-cloud"></i></div>
+            <div class="sr-info"><div class="sr-label">Cloud backup</div><div class="sr-sub">Last synced 2 min ago</div></div>
+            <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+          </div>
+        </div>
+
+        <div class="settings-label">Subscription</div>
+        <div class="settings-group">
+          <div class="settings-row" onclick="openPlanModal()">
+            <div class="sr-icon sr-green"><i class="ti ti-star"></i></div>
+            <div class="sr-info"><div class="sr-label" id="sub-plan-label">Free plan</div><div class="sr-sub" id="sub-plan-sub">Upgrade for unlimited documents</div></div>
+            <i class="ti ti-chevron-right sr-right"></i>
+          </div>
+          <div class="settings-row" onclick="openBillingModal()">
+            <div class="sr-icon sr-gray"><i class="ti ti-credit-card"></i></div>
+            <div class="sr-info"><div class="sr-label">Billing</div><div class="sr-sub">Visa ···· 4242</div></div>
+            <i class="ti ti-chevron-right sr-right"></i>
+          </div>
+        </div>
+
+        <div class="settings-label">More</div>
+        <div class="settings-group" style="margin-bottom:16px;">
+          <div class="settings-row" onclick="openPrivacyModal()">
+            <div class="sr-icon sr-gray"><i class="ti ti-shield"></i></div>
+            <div class="sr-info"><div class="sr-label">Privacy & security</div></div>
+            <i class="ti ti-chevron-right sr-right"></i>
+          </div>
+          <div class="settings-row" onclick="openHelpModal()">
+            <div class="sr-icon sr-gray"><i class="ti ti-help-circle"></i></div>
+            <div class="sr-info"><div class="sr-label">Help & support</div></div>
+            <i class="ti ti-chevron-right sr-right"></i>
+          </div>
+          <div class="settings-row" onclick="confirmSignOut()">
+            <div class="sr-icon sr-red"><i class="ti ti-logout"></i></div>
+            <div class="sr-info"><div class="sr-label" style="color:#F87171;">Sign out</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <div class="bottom-nav">
+    <div class="nav-item active" id="nav-dashboard" onclick="showScreen('screen-dashboard')"><i class="ti ti-home"></i><span>Dashboard</span></div>
+    <div class="nav-item" id="nav-documents" onclick="showScreen('screen-documents')"><i class="ti ti-files"></i><span>Documents</span></div>
+    <div class="nav-item" id="nav-family" onclick="showScreen('screen-family')"><i class="ti ti-users"></i><span>Family</span></div>
+    <div class="nav-item" id="nav-alerts" onclick="showScreen('screen-alerts')"><i class="ti ti-bell"></i><span>Alerts</span></div>
+    <div class="nav-item" id="nav-settings" onclick="showScreen('screen-settings')"><i class="ti ti-settings"></i><span>Settings</span></div>
+  </div>
+</div>
+
+<!-- APP MENU (3-dot) -->
+<div class="app-menu-overlay" id="appMenuOverlay" onclick="if(event.target===this) closeAppMenu()">
+  <div class="app-menu-sheet" id="appMenuSheet">
+    <div class="app-menu-item" onclick="closeAppMenu(); showScreen('screen-dashboard');"><i class="ti ti-home"></i> Dashboard</div>
+    <div class="app-menu-item" onclick="closeAppMenu(); showScreen('screen-settings');"><i class="ti ti-settings"></i> Settings</div>
+    <div class="app-menu-item" onclick="closeAppMenu(); openHelpModal();"><i class="ti ti-help-circle"></i> Help & support</div>
+    <div class="app-menu-divider"></div>
+    <a class="app-menu-item back-link" id="backToSiteLink" href="../index.html"><i class="ti ti-arrow-left"></i> Back to Keon's Castle</a>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay" onclick="if(event.target===this) closeModal()">
+  <div class="modal-sheet" id="modalSheet"></div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"><i class="ti ti-circle-check"></i><span id="toastMsg"></span></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="auth.js"></script>
+<script src="app.js"></script>
+<script src="interactions.js"></script>
+</body>
+</html>
