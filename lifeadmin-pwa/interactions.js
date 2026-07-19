@@ -315,16 +315,21 @@ function openPlanModal() {
     <div class="modal-title">LifeAdmin Premium</div>
     <div class="modal-sub">Track unlimited documents, add family members, and get renewal reminders before it's too late.</div>
     <div class="modal-btns" style="flex-direction:column;gap:10px;">
-      <button class="modal-btn primary" onclick="startCheckout('month')">Subscribe monthly — $6/mo</button>
-      <button class="modal-btn secondary" onclick="startCheckout('year')">Subscribe annually — $50/yr <span style="opacity:0.6;">(save ~30%)</span></button>
+      <button class="modal-btn primary" onclick="startCheckout('month')">Subscribe monthly — $3.99/mo</button>
+      <button class="modal-btn secondary" onclick="startCheckout('year')">Subscribe annually — $35.99/yr <span style="opacity:0.6;">(save ~25%)</span></button>
     </div>
     <div class="modal-sub" style="margin-top:14px;margin-bottom:0;text-align:center;">You'll be asked for your email, then redirected to Stripe's secure checkout.</div>
   `);
 }
 
 async function startCheckout(interval) {
-  const email = prompt('Enter your email to continue to checkout:');
-  if (!email) return;
+  if (!window.currentUser) {
+    closeModal();
+    openAuthGate('signup');
+    showToast('Create a free account first to start your trial');
+    return;
+  }
+  const email = window.currentUser.email;
 
   modalSheet.innerHTML = `
     <div class="modal-title">Redirecting to checkout…</div>
@@ -335,7 +340,7 @@ async function startCheckout(interval) {
     const res = await fetch('/.netlify/functions/create-checkout', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ interval, userEmail: email, userId: null })
+      body: JSON.stringify({ app: 'lifeadmin', interval, userEmail: email, userId: window.currentUser.id })
     });
     const data = await res.json();
     if (data.url) {
@@ -382,7 +387,7 @@ function openHelpModal() {
     <div class="modal-title">Help & support</div>
     <div class="modal-sub">Have a question or ran into an issue? We usually reply within a few hours.</div>
     <div class="modal-btns">
-      <a class="modal-btn secondary" href="mailto:hello@keonscastlellc.com" style="text-decoration:none;display:flex;align-items:center;justify-content:center;">Email support</a>
+      <a class="modal-btn secondary" href="mailto:llgilchrist73@gmail.com" style="text-decoration:none;display:flex;align-items:center;justify-content:center;">Email support</a>
       <button class="modal-btn primary" onclick="closeModal()">Done</button>
     </div>
   `);
@@ -400,10 +405,5 @@ function confirmSignOut() {
 }
 function doSignOut() {
   closeModal();
-  document.getElementById('signoutOverlay').classList.add('show');
-}
-function signBackIn() {
-  document.getElementById('signoutOverlay').classList.remove('show');
-  showScreen('screen-dashboard');
-  showToast('Welcome back!');
+  realSignOut();
 }

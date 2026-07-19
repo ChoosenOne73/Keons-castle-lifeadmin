@@ -42,6 +42,41 @@
   </div>
 </div>
 
+<!-- PREVIEW BANNER (shown to guests browsing before they sign up) -->
+<div class="install-banner" id="previewBanner">
+  <div class="install-banner-inner">
+    <div class="install-text">
+      <div class="install-title">You're viewing a preview</div>
+      <div class="install-sub">Create a free account to save your own data</div>
+    </div>
+    <button class="install-btn" onclick="openAuthGate('signup')">Start free trial</button>
+    <button class="install-dismiss" onclick="openAuthGate('signin')" style="text-decoration:underline;font-size:12px;">Sign in</button>
+  </div>
+</div>
+
+<!-- AUTH GATE -->
+<div class="signout-overlay" id="authGate">
+  <button class="install-dismiss" id="authCloseBtn" onclick="closeAuthGate()" aria-label="Close" style="position:absolute;top:max(16px,env(safe-area-inset-top));right:16px;font-size:22px;">✕</button>
+  <svg width="52" height="64" viewBox="0 0 130 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <defs><linearGradient id="lgAuth" x1="65" y1="0" x2="65" y2="160" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#C2F26B"/><stop offset="100%" stop-color="#5BAA22"/></linearGradient></defs>
+    <rect x="6" y="6" width="118" height="148" rx="44" stroke="url(#lgAuth)" stroke-width="7" fill="none"/>
+    <line x1="65" y1="88" x2="65" y2="118" stroke="url(#lgAuth)" stroke-width="6.5" stroke-linecap="round"/>
+    <circle cx="65" cy="44" r="18" stroke="url(#lgAuth)" stroke-width="6" fill="none"/>
+    <circle cx="46" cy="54" r="16" stroke="url(#lgAuth)" stroke-width="6" fill="none"/>
+    <circle cx="84" cy="54" r="16" stroke="url(#lgAuth)" stroke-width="6" fill="none"/>
+  </svg>
+  <div class="modal-title" id="authTitle">Welcome to LifeAdmin</div>
+  <div class="msg" id="authSubtitle">Sign in to track your documents and deadlines.</div>
+  <div style="width:100%;max-width:300px;display:flex;flex-direction:column;gap:10px;text-align:left;">
+    <input class="modal-input" id="authEmail" type="email" placeholder="Email" autocomplete="email">
+    <input class="modal-input" id="authPassword" type="password" placeholder="Password (6+ characters)" autocomplete="current-password">
+    <div id="authError" style="color:#F87171;font-size:12.5px;display:none;"></div>
+    <div id="authInfo" style="color:rgba(255,255,255,0.5);font-size:12.5px;display:none;"></div>
+    <button class="modal-btn primary" id="authSubmitBtn" onclick="handleAuthSubmit()">Sign in</button>
+    <button class="modal-btn secondary" id="authToggleBtn" onclick="toggleAuthMode()">New here? Create an account</button>
+  </div>
+</div>
+
 <div class="app" id="app">
   <div class="status-bar">
     <span id="clock">9:41</span>
@@ -293,7 +328,7 @@
         <div>
           <div class="profile-name" id="profile-name">Marcus Rivera</div>
           <div class="profile-email" id="profile-email">marcus@email.com</div>
-          <div class="profile-plan"><i class="ti ti-star" style="font-size:11px;"></i> Premium plan</div>
+          <div class="profile-plan"><i class="ti ti-star" style="font-size:11px;"></i> <span id="profile-plan-text">Premium plan</span></div>
         </div>
       </div>
 
@@ -340,7 +375,7 @@
         <div class="settings-group">
           <div class="settings-row" onclick="openPlanModal()">
             <div class="sr-icon sr-green"><i class="ti ti-star"></i></div>
-            <div class="sr-info"><div class="sr-label">Premium plan</div><div class="sr-sub">$6/month · Renews Aug 1</div></div>
+            <div class="sr-info"><div class="sr-label" id="sub-plan-label">Free plan</div><div class="sr-sub" id="sub-plan-sub">Upgrade for unlimited documents</div></div>
             <i class="ti ti-chevron-right sr-right"></i>
           </div>
           <div class="settings-row" onclick="openBillingModal()">
@@ -400,14 +435,8 @@
 <!-- TOAST -->
 <div class="toast" id="toast"><i class="ti ti-circle-check"></i><span id="toastMsg"></span></div>
 
-<!-- SIGN OUT OVERLAY -->
-<div class="signout-overlay" id="signoutOverlay">
-  <div class="scan-check"><i class="ti ti-check"></i></div>
-  <div class="modal-title">You've signed out</div>
-  <div class="msg">This is a demo build, so your data stays right here. Tap below to jump back in.</div>
-  <div class="modal-btn primary" style="max-width:220px;" onclick="signBackIn()">Sign back in</div>
-</div>
-
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="auth.js"></script>
 <script src="app.js"></script>
 <script src="interactions.js"></script>
 </body>
