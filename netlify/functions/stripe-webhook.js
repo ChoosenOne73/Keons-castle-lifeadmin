@@ -12,12 +12,36 @@
 
 const Stripe = require('stripe');
 const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
-const { createClient } = require('@supabase/supabase-js');
 
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE_KEY
-);
+const SUPABASE_URL = process.env.SUPABASE_URL;
+const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+// Plain REST call to Supabase's PostgREST API instead of the supabase-js
+// client library -- avoids a mystery 403 the SDK was triggering.
+async function supabaseUpdate(table, matchColumn, matchValue, updates) {
+  const url = `${SUPABASE_URL}/rest/v1/${table}?${matchColumn}=eq.${encodeURIComponent(matchValue)}`;
+  const res = await fetch(url, {
+    method: 'PATCH',
+    headers: {
+      'apikey': SERVICE_KEY,
+      'Authorization': `Bearer ${SERVICE_KEY}`,
+      'Content-Type': 'application/json',
+      'Prefer': 'return=representation',
+    },
+    body: JSON.stringify(updates),
+  });
+
+  const text = await res.text();
+  let data;
+  try { data = JSON.parse(text); } catch { data = text; }
+
+  if (!res.ok) {
+    console.error(`Supabase update FAILED (${table}):`, res.status, JSON.stringify(data));
+    return { data: null, error: data };
+  }
+  console.log(`Supabase update SUCCESS (${table}), rows affected:`, JSON.stringify(data));
+  return { data, error: null };
+}
 
 exports.handler = async (event) => {
   const sig = event.headers['stripe-signature'];
@@ -47,25 +71,20 @@ exports.handler = async (event) => {
         if (app === 'lifeadmin' || app === 'leftovers') {
           const userId = session.client_reference_id;
           console.log('Attempting profile update for userId:', userId);
-          const { data, error } = await supabase.from('profiles').update({
+          await supabaseUpdate('profiles', 'id', userId, {
             plan: 'premium',
             stripe_customer_id: session.customer,
             stripe_subscription_id: session.subscription,
             subscription_status: 'active',
             billing_interval: session.metadata?.interval,
-          }).eq('id', userId).select();
-          if (error) {
-            console.error('Supabase update FAILED:', JSON.stringify(error));
-          } else {
-            console.log('Supabase update SUCCESS, rows affected:', JSON.stringify(data));
-          }
+          });
 
         } else if (app === 'autocare') {
           const bookingId = session.metadata?.bookingId;
           if (bookingId) {
-            await supabase.from('bookings').update({
+            await supabaseUpdate('bookings', 'id', bookingId, {
               stripe_payment_intent_id: session.payment_intent,
-            }).eq('id', bookingId);
+            });
           }
 
         } else if (app === 'neighborhood-helper' || app === 'roadside-warriors') {
@@ -79,7 +98,7 @@ exports.handler = async (event) => {
             } else {
               updates = { status: 'accepted', stripe_payment_intent_id: session.payment_intent };
             }
-            await supabase.from(recordTable).update(updates).eq('id', recordId);
+            await supabaseUpdate(recordTable, 'id', recordId, updates);
           }
         }
         break;
@@ -92,9 +111,10 @@ exports.handler = async (event) => {
         const status = subscription.status;
         const plan = (status === 'active' || status === 'trialing') ? 'premium' : 'free';
 
-        await supabase.from('profiles')
-          .update({ subscription_status: status, plan })
-          .eq('stripe_subscription_id', subscription.id);
+        await supabaseUpdate('profiles', 'stripe_subscription_id', subscription.id, {
+          subscription_status: status,
+          plan,
+        });
         break;
       }
 
@@ -105,9 +125,10 @@ exports.handler = async (event) => {
         const account = stripeEvent.data.object;
         const isFullyOnboarded = account.details_submitted && account.charges_enabled;
 
-        await supabase.from('providers')
-          .update({ onboarding_complete: isFullyOnboarded, verified: isFullyOnboarded })
-          .eq('stripe_connect_account_id', account.id);
+        await supabaseUpdate('providers', 'stripe_connect_account_id', account.id, {
+          onboarding_complete: isFullyOnboarded,
+          verified: isFullyOnboarded,
+        });
         break;
       }
 
