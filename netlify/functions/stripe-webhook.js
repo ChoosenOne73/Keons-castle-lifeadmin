@@ -46,13 +46,19 @@ exports.handler = async (event) => {
 
         if (app === 'lifeadmin' || app === 'leftovers') {
           const userId = session.client_reference_id;
-          await supabase.from('profiles').update({
+          console.log('Attempting profile update for userId:', userId);
+          const { data, error } = await supabase.from('profiles').update({
             plan: 'premium',
             stripe_customer_id: session.customer,
             stripe_subscription_id: session.subscription,
             subscription_status: 'active',
             billing_interval: session.metadata?.interval,
-          }).eq('id', userId);
+          }).eq('id', userId).select();
+          if (error) {
+            console.error('Supabase update FAILED:', JSON.stringify(error));
+          } else {
+            console.log('Supabase update SUCCESS, rows affected:', JSON.stringify(data));
+          }
 
         } else if (app === 'autocare') {
           const bookingId = session.metadata?.bookingId;
