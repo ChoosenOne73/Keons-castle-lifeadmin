@@ -92,12 +92,24 @@
           <div class="slot-grid" id="slotGrid"></div>
         </div>
         <div class="modal-field">
-          <label class="modal-label">Vehicle</label>
-          <input class="modal-input" id="bookVehicle" placeholder="e.g. 2019 Honda Civic">
+          <label class="modal-label">Vehicle year</label>
+          <select class="modal-select" id="bookVehicleYear"></select>
+        </div>
+        <div class="modal-field">
+          <label class="modal-label">Vehicle make</label>
+          <select class="modal-select" id="bookVehicleMake" onchange="populateModelDropdown()"></select>
+        </div>
+        <div class="modal-field">
+          <label class="modal-label">Vehicle model</label>
+          <select class="modal-select" id="bookVehicleModel" onchange="toggleModelOtherInput()"></select>
+          <input class="modal-input" id="bookVehicleModelOther" placeholder="Type your model" style="display:none;margin-top:8px;">
         </div>
         <div class="modal-field">
           <label class="modal-label">Your location</label>
           <input class="modal-input" id="bookAddress" placeholder="Where are you stuck?">
+          <div onclick="useCurrentLocation()" style="margin-top:8px;display:flex;align-items:center;gap:6px;cursor:pointer;color:#F59E0B;font-size:13px;font-weight:600;">
+            <i class="ti ti-current-location"></i><span id="gpsStatusText">Use my current location</span>
+          </div>
         </div>
         <div class="modal-field">
           <label class="modal-label">Contact phone</label>
@@ -105,7 +117,8 @@
         </div>
         <div class="modal-field">
           <label class="modal-label">Notes (optional)</label>
-          <input class="modal-input" id="bookNotes" placeholder="Anything we should know?">
+          <select class="modal-select" id="bookNotesPreset" onchange="toggleNotesOtherInput()"></select>
+          <input class="modal-input" id="bookNotesOther" placeholder="Tell us more" style="display:none;margin-top:8px;">
         </div>
       </div>
       <div style="padding:6px 20px max(16px, env(safe-area-inset-bottom));">
