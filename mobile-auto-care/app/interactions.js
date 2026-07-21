@@ -52,8 +52,19 @@ function confirmBooking() {
     <div class="modal-btns" style="flex-direction:column;gap:10px;">
       <button class="modal-btn primary" onclick="payForBooking('${newAppt.id}', '${serviceId}')">Pay & confirm booking \u2192</button>
       <button class="modal-btn secondary" onclick="closeModal(); showScreen('screen-appointments');">Pay later</button>
+      <button class="modal-btn danger" onclick="cancelUnpaidBooking('${newAppt.id}')">Cancel</button>
     </div>
   `);
+}
+
+// Discards a booking the customer decided not to go through with (used from
+// the Confirm & pay popup's Cancel button) and returns them to Home, rather
+// than leaving an unpaid pending appointment sitting in their Appointments tab.
+function cancelUnpaidBooking(apptId) {
+  appointments = appointments.filter(a => a.id !== apptId);
+  closeModal();
+  showScreen('screen-home');
+  showToast('Booking canceled');
 }
 
 async function payForBooking(apptId, serviceId) {
