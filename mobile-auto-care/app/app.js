@@ -11,9 +11,9 @@ let services = [
 ];
 
 let appointments = [
-  { id: 'a1', serviceId: 'sv6', date: addDays(2), time: '10:00 AM', vehicle: '2019 Honda Civic', address: '142 Oak Street', phone: '(240) 315-1464', notes: '', status: 'upcoming' },
-  { id: 'a2', serviceId: 'sv1', date: addDays(-14), time: '2:00 PM', vehicle: '2019 Honda Civic', address: '142 Oak Street', phone: '(240) 315-1464', notes: '', status: 'completed' },
-  { id: 'a3', serviceId: 'sv3', date: addDays(-40), time: '9:00 AM', vehicle: '2019 Honda Civic', address: '142 Oak Street', phone: '(240) 315-1464', notes: '', status: 'completed' }
+  { id: 'a1', serviceId: 'sv6', date: addDays(2), time: '10:00 AM', vehicle: '2019 Honda Civic', address: '142 Oak Street', phone: '(240) 315-1464', notes: '', status: 'upcoming', latitude: null, longitude: null },
+  { id: 'a2', serviceId: 'sv1', date: addDays(-14), time: '2:00 PM', vehicle: '2019 Honda Civic', address: '142 Oak Street', phone: '(240) 315-1464', notes: '', status: 'completed', latitude: null, longitude: null },
+  { id: 'a3', serviceId: 'sv3', date: addDays(-40), time: '9:00 AM', vehicle: '2019 Honda Civic', address: '142 Oak Street', phone: '(240) 315-1464', notes: '', status: 'completed', latitude: null, longitude: null }
 ];
 
 let reviews = [
@@ -33,6 +33,65 @@ function formatDate(iso) {
   return d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
 }
 function serviceById(id) { return services.find(s => s.id === id); }
+
+// ===== Vehicle & notes data for the booking form =====
+const VEHICLE_YEARS = (() => { const arr = []; for (let y = 2027; y >= 1990; y--) arr.push(y); return arr; })();
+
+const VEHICLE_MAKES = ['Acura','Alfa Romeo','Audi','BMW','Buick','Cadillac','Chevrolet','Chrysler','Dodge','Fiat','Ford','Genesis','GMC','Honda','Hyundai','Infiniti','Jaguar','Jeep','Kia','Land Rover','Lexus','Lincoln','Mazda','Mercedes-Benz','MINI','Mitsubishi','Nissan','Porsche','Ram','Subaru','Suzuki','Tesla','Toyota','Volkswagen','Volvo'];
+
+const VEHICLE_MODELS = {
+  'Acura': ['ILX','TLX','RDX','MDX'],
+  'Alfa Romeo': ['Giulia','Stelvio'],
+  'Audi': ['A3','A4','A6','Q3','Q5','Q7'],
+  'BMW': ['2 Series','3 Series','5 Series','X1','X3','X5'],
+  'Buick': ['Encore','Enclave','Envision'],
+  'Cadillac': ['CT4','CT5','XT4','XT5','Escalade'],
+  'Chevrolet': ['Spark','Sonic','Cruze','Malibu','Impala','Camaro','Corvette','Trax','Equinox','Blazer','Traverse','Tahoe','Suburban','Silverado','Colorado'],
+  'Chrysler': ['300','Pacifica','Voyager'],
+  'Dodge': ['Charger','Challenger','Durango','Journey','Grand Caravan'],
+  'Fiat': ['500','500X'],
+  'Ford': ['Fiesta','Focus','Fusion','Mustang','EcoSport','Escape','Edge','Explorer','Expedition','Bronco','Ranger','F-150','F-250'],
+  'Genesis': ['G70','G80','G90','GV70','GV80'],
+  'GMC': ['Terrain','Acadia','Yukon','Sierra','Canyon'],
+  'Honda': ['Fit','Civic','Accord','Insight','HR-V','CR-V','Passport','Pilot','Ridgeline','Odyssey'],
+  'Hyundai': ['Accent','Elantra','Sonata','Venue','Kona','Tucson','Santa Fe','Palisade'],
+  'Infiniti': ['Q50','Q60','QX50','QX60','QX80'],
+  'Jaguar': ['XE','XF','F-Pace','E-Pace'],
+  'Jeep': ['Renegade','Compass','Cherokee','Grand Cherokee','Wrangler','Gladiator'],
+  'Kia': ['Rio','Forte','K5','Soul','Seltos','Sportage','Sorento','Telluride'],
+  'Land Rover': ['Discovery','Discovery Sport','Range Rover','Range Rover Sport','Range Rover Evoque'],
+  'Lexus': ['IS','ES','RX','NX','GX'],
+  'Lincoln': ['Corsair','Nautilus','Aviator','Navigator'],
+  'Mazda': ['Mazda3','Mazda6','CX-3','CX-5','CX-9'],
+  'Mercedes-Benz': ['A-Class','C-Class','E-Class','GLA','GLC','GLE'],
+  'MINI': ['Cooper','Countryman','Clubman'],
+  'Mitsubishi': ['Mirage','Outlander','Eclipse Cross'],
+  'Nissan': ['Versa','Sentra','Altima','Maxima','Kicks','Rogue','Murano','Pathfinder','Armada','Frontier','Titan'],
+  'Porsche': ['718','911','Macan','Cayenne','Panamera'],
+  'Ram': ['1500','2500','3500','ProMaster'],
+  'Subaru': ['Impreza','Legacy','Crosstrek','Forester','Outback','Ascent'],
+  'Suzuki': [],
+  'Tesla': ['Model 3','Model S','Model X','Model Y'],
+  'Toyota': ['Corolla','Camry','Avalon','Prius','C-HR','RAV4','Highlander','4Runner','Sequoia','Tacoma','Tundra','Sienna'],
+  'Volkswagen': ['Jetta','Passat','Golf','Beetle','Tiguan','Atlas'],
+  'Volvo': ['S60','S90','XC40','XC60','XC90']
+};
+
+// Auto Care's preset situations for the Notes dropdown -- "Other" reveals a
+// free-text box so customers can always add specifics.
+const NOTES_PRESETS = [
+  'Regular maintenance / routine service',
+  'Check engine light is on',
+  "Car won't start",
+  'Unusual noise or vibration',
+  'Not sure \u2014 need a diagnosis',
+  'Other'
+];
+
+// Holds the customer's GPS coordinates once "Use my current location"
+// succeeds. Reset each time a new booking starts; stays null if they never
+// tap it or it fails, so the typed address is always the fallback of record.
+let bookingGpsCoords = null;
 
 let currentBookingService = null;
 let selectedSlot = null;
@@ -140,6 +199,9 @@ function startBooking(serviceId) {
   document.getElementById('bookDate').min = addDays(0);
   selectedSlot = null;
   renderTimeSlots();
+  bookingGpsCoords = null;
+  populateVehicleDropdowns();
+  populateNotesDropdown();
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById('screen-book').classList.add('active');
 }
