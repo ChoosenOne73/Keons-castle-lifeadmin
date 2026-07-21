@@ -38,7 +38,7 @@ exports.handler = async (event) => {
     const appConfig = APPS[appKey];
 
     const siteUrl = process.env.URL || 'http://localhost:8888';
-    const session = await stripe.checkout.sessions.create({
+    const sessionParams = {
       mode: 'payment',
       payment_method_types: ['card'],
       line_items: [{
@@ -50,11 +50,17 @@ exports.handler = async (event) => {
         quantity: 1,
       }],
       customer_email: customerEmail,
-      client_reference_id: userId,
       success_url: `${siteUrl}/${appConfig.path}?checkout=success`,
       cancel_url: `${siteUrl}/${appConfig.path}?checkout=cancelled`,
-      metadata: { app: appKey, userId, bookingId: bookingId || '' }
-    });
+      // Stripe rejects client_reference_id if it's null/empty rather than omitted,
+      // so only set metadata.userId (never null) and only add client_reference_id
+      // when there's a real signed-in user id to attach.
+      metadata: { app: appKey, userId: userId || '', bookingId: bookingId || '' }
+    };
+    if (userId) {
+      sessionParams.client_reference_id = userId;
+    }
+    const session = await stripe.checkout.sessions.create(sessionParams);
     return { statusCode: 200, body: JSON.stringify({ url: session.url }) };
   } catch (err) {
     console.error('create-booking-payment error:', err);
