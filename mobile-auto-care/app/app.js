@@ -293,6 +293,7 @@ async function loadUserBookings() {
     .from('bookings')
     .select('*')
     .eq('customer_id', currentUser.id)
+    .eq('app', 'autocare')
     .order('created_at', { ascending: false });
 
   if (error) {
