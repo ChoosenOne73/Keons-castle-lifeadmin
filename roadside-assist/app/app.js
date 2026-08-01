@@ -1,3 +1,12 @@
+// ===== Supabase setup =====
+// Public/anon key -- safe to expose in frontend code. Never put the
+// service_role key here; that one stays server-side in Netlify env vars.
+const SUPABASE_URL = 'https://pbsxqddgdkxrhzifztpq.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBic3hxZGRnZGt4cmh6aWZ6dHBxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM4MTk0NzcsImV4cCI6MjA5OTM5NTQ3N30.9ax-68EbpxpWYAd9CLovY5DhGG88QPL7Qydm4sLGsrM';
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+let currentUser = null;
+
 // ===== Data =====
 let services = [
   { id: 'sv1', name: 'Jump Start', emoji: '🔋', price: 55, desc: 'Dead battery? We\u2019ll get your engine running again in minutes.' },
@@ -10,11 +19,7 @@ let services = [
   { id: 'sv8', name: 'Emergency Dispatch', emoji: '🚨', price: 75, desc: 'Not sure what\u2019s wrong? We\u2019ll diagnose on site.' }
 ];
 
-let appointments = [
-  { id: 'a1', serviceId: 'sv2', date: addDays(2), time: '10:00 AM', vehicle: '2019 Honda Civic', address: '142 Oak Street', phone: '(240) 315-1464', notes: '', status: 'upcoming', latitude: null, longitude: null },
-  { id: 'a2', serviceId: 'sv1', date: addDays(-14), time: '2:00 PM', vehicle: '2019 Honda Civic', address: '142 Oak Street', phone: '(240) 315-1464', notes: '', status: 'completed', latitude: null, longitude: null },
-  { id: 'a3', serviceId: 'sv5', date: addDays(-40), time: '9:00 AM', vehicle: '2019 Honda Civic', address: '142 Oak Street', phone: '(240) 315-1464', notes: '', status: 'completed', latitude: null, longitude: null }
-];
+let appointments = [];
 
 let reviews = [
   { id: 'rv1', name: 'Dana M.', initials: 'DM', rating: 5, service: 'Lockout Service', text: 'Locked my keys in the car at 11pm and they had someone there in 25 minutes.', date: '3 days ago' },
@@ -88,9 +93,6 @@ const NOTES_PRESETS = [
   'Other'
 ];
 
-// Holds the customer's GPS coordinates once "Use my current location"
-// succeeds. Reset each time a new request starts; stays null if they never
-// tap it or it fails, so the typed location is always the fallback of record.
 let bookingGpsCoords = null;
 
 let currentBookingService = null;
@@ -139,7 +141,7 @@ function renderHome() {
     const a = upcoming[0];
     const s = serviceById(a.serviceId);
     nextCard.style.display = 'block';
-    nextCard.innerHTML = `<div class="label">Next request</div><div class="svc">${s.emoji} ${s.name}</div><div class="when">${formatDate(a.date)} at ${a.time} · ${a.address}</div>`;
+    nextCard.innerHTML = `<div class="label">Next request</div><div class="svc">${s ? s.emoji : ''} ${s ? s.name : a.serviceName || ''}</div><div class="when">${formatDate(a.date)} at ${a.time} · ${a.address}</div>`;
   } else {
     nextCard.style.display = 'none';
   }
@@ -154,8 +156,9 @@ function renderServices() {
 
 function apptCardHTML(a) {
   const s = serviceById(a.serviceId);
+  const name = s ? `${s.emoji} ${s.name}` : (a.serviceName || 'Service');
   return `<div class="appt-card" onclick="openApptModal('${a.id}')">
-    <div class="top"><div class="svc">${s.emoji} ${s.name}</div><div class="badge ${a.status === 'upcoming' ? 'b-amber' : 'b-green'}">${a.status === 'upcoming' ? 'Upcoming' : 'Completed'}</div></div>
+    <div class="top"><div class="svc">${name}</div><div class="badge ${a.status === 'upcoming' ? 'b-amber' : 'b-green'}">${a.status === 'upcoming' ? 'Upcoming' : 'Completed'}</div></div>
     <div class="when">${formatDate(a.date)} at ${a.time} · ${a.address}</div>
   </div>`;
 }
@@ -227,27 +230,100 @@ function updateClock() {
 updateClock();
 setInterval(updateClock, 30000);
 
-document.addEventListener('DOMContentLoaded', () => {
-  renderHome();
-  renderServices();
-});
-
+// Service worker intentionally disabled -- its offline-caching logic was
+// found to intercept cross-origin requests (like the Supabase library) and
+// break sign-up on Auto Care. This actively unregisters any old service
+// worker still running in a visitor's browser, so everyone self-heals
+// automatically without needing to manually clear site data.
 if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('sw.js').catch(err => console.warn('Service worker registration failed:', err));
+  navigator.serviceWorker.getRegistrations().then(registrations => {
+    registrations.forEach(reg => reg.unregister());
   });
 }
 
-// Runs once on page load -- shows a confirmation if returning from a real
-// Stripe Checkout redirect for a booking payment.
+// ===== Real auth: session check on load =====
+async function initAuthAndApp() {
+  const { data: { session } } = await supabaseClient.auth.getSession();
+  if (session && session.user) {
+    await onSignedIn(session.user);
+  } else {
+    showAuthScreen();
+  }
+
+  supabaseClient.auth.onAuthStateChange((event, session) => {
+    if (event === 'SIGNED_IN' && session && session.user) {
+      onSignedIn(session.user);
+    } else if (event === 'SIGNED_OUT') {
+      currentUser = null;
+      appointments = [];
+      showAuthScreen();
+    }
+  });
+}
+
+async function onSignedIn(user) {
+  currentUser = user;
+  document.getElementById('authScreen').style.display = 'none';
+  document.getElementById('app').style.display = '';
+  document.getElementById('profile-email').textContent = user.email || '';
+  const initials = (user.email || 'ME').slice(0, 2).toUpperCase();
+  document.getElementById('profile-avatar').textContent = initials;
+  document.getElementById('topAvatar').textContent = initials;
+  await loadUserBookings();
+  renderHome();
+  renderServices();
+}
+
+function showAuthScreen() {
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('authScreen').style.display = 'flex';
+}
+
+async function loadUserBookings() {
+  if (!currentUser) return;
+  const { data, error } = await supabaseClient
+    .from('bookings')
+    .select('*')
+    .eq('customer_id', currentUser.id)
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error('Error loading bookings:', error);
+    showToast('Could not load your requests \u2014 please try refreshing');
+    return;
+  }
+
+  appointments = (data || []).map(row => ({
+    id: row.id,
+    serviceId: null,
+    serviceName: row.service_name,
+    price: row.price,
+    date: row.scheduled_date,
+    time: row.scheduled_time,
+    vehicle: row.vehicle,
+    address: row.address,
+    phone: row.phone,
+    notes: row.notes,
+    latitude: row.latitude,
+    longitude: row.longitude,
+    status: row.status
+  }));
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  initAuthAndApp();
+});
+
 document.addEventListener('DOMContentLoaded', () => {
   const params = new URLSearchParams(window.location.search);
   const checkoutStatus = params.get('checkout');
   if (!checkoutStatus) return;
   window.history.replaceState({}, '', window.location.pathname);
   if (checkoutStatus === 'success') {
-    showScreen('screen-appointments');
-    showToast('Payment successful \u2014 your request is confirmed!');
+    loadUserBookings().then(() => {
+      showScreen('screen-appointments');
+      showToast('Payment successful \u2014 your request is confirmed!');
+    });
   } else if (checkoutStatus === 'cancelled') {
     showToast('Checkout cancelled \u2014 your request was not confirmed');
   }
