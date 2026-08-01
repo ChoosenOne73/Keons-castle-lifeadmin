@@ -236,11 +236,18 @@ function updateClock() {
 updateClock();
 setInterval(updateClock, 30000);
 
+// Service worker temporarily disabled while real-accounts work is being
+// stabilized -- its offline-caching logic was intercepting cross-origin
+// requests (like the Supabase library) and breaking sign-up. This block
+// actively unregisters any old service worker still running in a visitor's
+// browser, so everyone self-heals automatically without needing to manually
+// clear site data. Offline support can be re-enabled later once everything
+// else is confirmed solid.
 if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('sw.js').catch(err => console.warn('Service worker registration failed:', err));
+  navigator.serviceWorker.getRegistrations().then(registrations => {
+    registrations.forEach(reg => reg.unregister());
   });
-}
+
 
 // ===== Real auth: session check on load =====
 async function initAuthAndApp() {
