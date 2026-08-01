@@ -227,6 +227,7 @@ async function payForBooking() {
     .from('bookings')
     .insert({
       customer_id: currentUser.id,
+      app: 'autocare',
       service_name: draft.serviceName,
       price: draft.price,
       scheduled_date: draft.date,
