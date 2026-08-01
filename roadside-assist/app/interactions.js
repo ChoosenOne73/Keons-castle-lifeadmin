@@ -15,13 +15,75 @@ function showToast(msg) {
 }
 
 // ===== App menu (3-dot) =====
-const BACK_TO_SITE_URL = '../index.html'; // update this to match your deployed folder structure
+const BACK_TO_SITE_URL = '../index.html';
 document.addEventListener('DOMContentLoaded', () => {
   const link = document.getElementById('backToSiteLink');
   if (link) link.href = BACK_TO_SITE_URL;
 });
 function openAppMenu() { document.getElementById('appMenuOverlay').classList.add('show'); }
 function closeAppMenu() { document.getElementById('appMenuOverlay').classList.remove('show'); }
+
+// ===== Real auth: sign in / sign up =====
+let authMode = 'signin';
+function toggleAuthMode(e) {
+  if (e) e.preventDefault();
+  authMode = authMode === 'signin' ? 'signup' : 'signin';
+  document.getElementById('authError').textContent = '';
+  if (authMode === 'signup') {
+    document.getElementById('authTitle').textContent = 'Create your account';
+    document.getElementById('authSubtitle').textContent = 'Sign up to request and manage your service';
+    document.getElementById('authSubmitBtn').textContent = 'Sign up';
+    document.getElementById('authSwitchText').textContent = 'Already have an account?';
+    document.getElementById('authSwitchLink').textContent = 'Sign in';
+  } else {
+    document.getElementById('authTitle').textContent = 'Welcome back';
+    document.getElementById('authSubtitle').textContent = 'Sign in to request and manage your service';
+    document.getElementById('authSubmitBtn').textContent = 'Sign in';
+    document.getElementById('authSwitchText').textContent = "Don't have an account?";
+    document.getElementById('authSwitchLink').textContent = 'Sign up';
+  }
+}
+
+async function handleAuthSubmit() {
+  const email = document.getElementById('authEmail').value.trim();
+  const password = document.getElementById('authPassword').value;
+  const errorEl = document.getElementById('authError');
+  errorEl.textContent = '';
+
+  if (!email || !password) {
+    errorEl.textContent = 'Please enter both email and password';
+    return;
+  }
+  if (password.length < 6) {
+    errorEl.textContent = 'Password must be at least 6 characters';
+    return;
+  }
+
+  const submitBtn = document.getElementById('authSubmitBtn');
+  submitBtn.textContent = authMode === 'signup' ? 'Signing up\u2026' : 'Signing in\u2026';
+
+  try {
+    if (authMode === 'signup') {
+      const { data, error } = await supabaseClient.auth.signUp({ email, password });
+      if (error) throw error;
+      if (!data.session) {
+        errorEl.textContent = 'Account created \u2014 please sign in.';
+        toggleAuthMode();
+      }
+    } else {
+      const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
+      if (error) throw error;
+    }
+  } catch (err) {
+    errorEl.textContent = err.message || 'Something went wrong \u2014 please try again';
+  } finally {
+    submitBtn.textContent = authMode === 'signup' ? 'Sign up' : 'Sign in';
+  }
+}
+
+async function realSignOut() {
+  await supabaseClient.auth.signOut();
+}
 
 // ===== Vehicle dropdown population =====
 function populateVehicleDropdowns() {
@@ -68,10 +130,6 @@ function toggleNotesOtherInput() {
 }
 
 // ===== GPS =====
-// Grabs the customer's precise coordinates via the browser's geolocation API.
-// The typed location stays the primary/required field -- GPS is a backup pin
-// for dispatched providers, so failure here never blocks the request, it just
-// falls back to asking them to double check their typed location.
 function useCurrentLocation() {
   const statusText = document.getElementById('gpsStatusText');
   if (!navigator.geolocation) {
@@ -95,6 +153,8 @@ function useCurrentLocation() {
 }
 
 // ===== Booking =====
+let pendingBookingDraft = null;
+
 function confirmBooking() {
   const serviceId = document.getElementById('bookService').value;
   const date = document.getElementById('bookDate').value;
@@ -121,41 +181,64 @@ function confirmBooking() {
 
   const vehicle = `${year} ${make} ${model}`.trim();
   const s = serviceById(serviceId);
-  const newAppt = {
-    id: 'a' + Date.now(), serviceId, date, time: selectedSlot,
-    vehicle, address, phone, notes, status: 'upcoming',
+
+  pendingBookingDraft = {
+    serviceId, serviceName: s.name, price: s.price, date, time: selectedSlot,
+    vehicle, address, phone, notes,
     latitude: bookingGpsCoords ? bookingGpsCoords.latitude : null,
     longitude: bookingGpsCoords ? bookingGpsCoords.longitude : null
   };
-  appointments.unshift(newAppt);
 
   openModal(`
     <div class="modal-title">Confirm & pay</div>
     <div class="modal-sub">${s.emoji} ${s.name} on ${formatDate(date)} at ${selectedSlot}</div>
     <div class="modal-info-row"><div class="k">Service</div><div class="v">$${s.price}+</div></div>
     <div class="modal-btns" style="flex-direction:column;gap:10px;">
-      <button class="modal-btn primary" onclick="payForBooking('${newAppt.id}', '${serviceId}')">Pay & confirm request \u2192</button>
-      <button class="modal-btn secondary" onclick="closeModal(); showScreen('screen-appointments');">Pay later</button>
-      <button class="modal-btn danger" onclick="cancelUnpaidBooking('${newAppt.id}')">Cancel</button>
+      <button class="modal-btn primary" onclick="payForBooking()">Pay & confirm request \u2192</button>
+      <button class="modal-btn secondary" onclick="closeModal(); showScreen('screen-home');">Cancel</button>
     </div>
   `);
 }
 
-// Discards a request the customer decided not to go through with (used from
-// the Confirm & pay popup's Cancel button) and returns them to Home, rather
-// than leaving an unpaid pending request sitting in their Requests tab.
-function cancelUnpaidBooking(apptId) {
-  appointments = appointments.filter(a => a.id !== apptId);
-  closeModal();
-  showScreen('screen-home');
-  showToast('Request canceled');
-}
+async function payForBooking() {
+  if (!currentUser || !pendingBookingDraft) {
+    showToast('Something went wrong \u2014 please try requesting again');
+    closeModal();
+    return;
+  }
+  const draft = pendingBookingDraft;
 
-async function payForBooking(apptId, serviceId) {
-  const appt = appointments.find(a => a.id === apptId);
-  const s = serviceById(serviceId);
-  const email = prompt('Enter your email for the payment receipt:');
-  if (!email) return;
+  modalSheet.innerHTML = `<div class="modal-title">Saving your request\u2026</div><div class="scan-anim"><div class="scan-spinner"></div></div>`;
+
+  const { data: inserted, error: insertError } = await supabaseClient
+    .from('bookings')
+    .insert({
+      customer_id: currentUser.id,
+      service_name: draft.serviceName,
+      price: draft.price,
+      scheduled_date: draft.date,
+      scheduled_time: draft.time,
+      address: draft.address,
+      vehicle: draft.vehicle,
+      phone: draft.phone,
+      notes: draft.notes,
+      latitude: draft.latitude,
+      longitude: draft.longitude,
+      status: 'upcoming'
+    })
+    .select()
+    .single();
+
+  if (insertError) {
+    console.error('Booking insert error:', insertError);
+    showToast('Could not save your request \u2014 please try again');
+    closeModal();
+    showScreen('screen-home');
+    return;
+  }
+
+  await loadUserBookings();
+  renderHome();
 
   modalSheet.innerHTML = `<div class="modal-title">Redirecting to checkout\u2026</div><div class="scan-anim"><div class="scan-spinner"></div></div>`;
 
@@ -165,64 +248,76 @@ async function payForBooking(apptId, serviceId) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         app: 'roadside',
-        serviceName: s.name,
-        amountInDollars: s.price,
-        customerEmail: email,
-        userId: null,
-        bookingId: apptId,
-        vehicle: appt ? appt.vehicle : undefined,
-        address: appt ? appt.address : undefined,
-        phone: appt ? appt.phone : undefined,
-        notes: appt ? appt.notes : undefined,
-        latitude: appt ? appt.latitude : undefined,
-        longitude: appt ? appt.longitude : undefined
+        serviceName: draft.serviceName,
+        amountInDollars: draft.price,
+        customerEmail: currentUser.email,
+        userId: currentUser.id,
+        bookingId: inserted.id,
+        vehicle: draft.vehicle,
+        address: draft.address,
+        phone: draft.phone,
+        notes: draft.notes,
+        latitude: draft.latitude,
+        longitude: draft.longitude
       })
     });
     const data = await res.json();
     if (data.url) {
       window.location.href = data.url;
     } else {
-      showToast('Something went wrong starting checkout \u2014 please try again');
+      showToast('Request saved, but checkout couldn\u2019t start \u2014 you can pay from My Requests');
       closeModal();
       showScreen('screen-appointments');
     }
   } catch (err) {
     console.error(err);
-    showToast('Could not reach checkout \u2014 please try again');
+    showToast('Request saved, but checkout couldn\u2019t start \u2014 you can pay from My Requests');
     closeModal();
     showScreen('screen-appointments');
   }
 }
-
 
 // ===== Appointment detail / cancel =====
 function openApptModal(id) {
   const a = appointments.find(x => x.id === id);
   if (!a) return;
   const s = serviceById(a.serviceId);
+  const name = s ? `${s.emoji} ${s.name}` : (a.serviceName || 'Service');
   openModal(`
-    <div class="modal-title">${s.emoji} ${s.name}</div>
+    <div class="modal-title">${name}</div>
     <div class="modal-sub">${formatDate(a.date)} at ${a.time}</div>
-    <div class="modal-info-row"><div class="k">Vehicle</div><div class="v">${a.vehicle}</div></div>
-    <div class="modal-info-row"><div class="k">Location</div><div class="v">${a.address}</div></div>
+    <div class="modal-info-row"><div class="k">Vehicle</div><div class="v">${a.vehicle || '\u2014'}</div></div>
+    <div class="modal-info-row"><div class="k">Location</div><div class="v">${a.address || '\u2014'}</div></div>
     ${a.latitude && a.longitude ? `<div class="modal-info-row"><div class="k">GPS pin</div><div class="v"><a href="https://maps.google.com/?q=${a.latitude},${a.longitude}" target="_blank" style="color:#F59E0B;">Open in Maps \u2192</a></div></div>` : ''}
-    <div class="modal-info-row"><div class="k">Phone</div><div class="v">${a.phone}</div></div>
+    <div class="modal-info-row"><div class="k">Phone</div><div class="v">${a.phone || '\u2014'}</div></div>
     <div class="modal-info-row"><div class="k">Status</div><div class="v" style="text-transform:capitalize;">${a.status}</div></div>
     ${a.notes ? `<div class="modal-info-row"><div class="k">Notes</div><div class="v">${a.notes}</div></div>` : ''}
     <div class="modal-btns">
-      ${a.status === 'upcoming' ? `<button class="modal-btn danger" onclick="cancelAppt('${a.id}')">Cancel request</button>` : `<button class="modal-btn primary" onclick="closeModal(); openLeaveReviewModal('${a.serviceId}');">Leave a review</button>`}
+      ${a.status === 'upcoming' ? `<button class="modal-btn danger" onclick="cancelAppt('${a.id}')">Cancel request</button>` : `<button class="modal-btn primary" onclick="closeModal(); openLeaveReviewModal();">Leave a review</button>`}
       <button class="modal-btn secondary" onclick="closeModal()">Close</button>
     </div>
   `);
 }
-function cancelAppt(id) {
-  appointments = appointments.filter(a => a.id !== id);
+
+async function cancelAppt(id) {
+  const { error } = await supabaseClient
+    .from('bookings')
+    .update({ status: 'cancelled' })
+    .eq('id', id)
+    .eq('customer_id', currentUser.id);
+
+  if (error) {
+    console.error('Cancel error:', error);
+    showToast('Could not cancel \u2014 please try again');
+    return;
+  }
   closeModal();
   showToast('Request canceled');
+  await loadUserBookings();
   renderAppointments(); renderHome();
 }
 
-// ===== Reviews =====
+// ===== Reviews (still demo/in-memory) =====
 let selectedRating = 5;
 function openLeaveReviewModal(prefServiceId) {
   selectedRating = 5;
@@ -273,39 +368,11 @@ function submitReview() {
 }
 
 // ===== Settings modals =====
-function openEditProfileModal() {
-  const name = document.getElementById('profile-name').textContent;
-  const email = document.getElementById('profile-email').textContent;
-  openModal(`
-    <div class="modal-title">Edit profile</div>
-    <div class="modal-field"><label class="modal-label">Full name</label><input class="modal-input" id="editName" value="${name}"></div>
-    <div class="modal-field"><label class="modal-label">Email</label><input class="modal-input" id="editEmail" value="${email}"></div>
-    <div class="modal-btns">
-      <button class="modal-btn secondary" onclick="closeModal()">Cancel</button>
-      <button class="modal-btn primary" onclick="saveProfile()">Save changes</button>
-    </div>
-  `);
-}
-function saveProfile() {
-  const name = document.getElementById('editName').value.trim();
-  const email = document.getElementById('editEmail').value.trim();
-  if (name) {
-    document.getElementById('profile-name').textContent = name;
-    const parts = name.trim().split(/\s+/);
-    const initials = ((parts[0]?.[0] || '') + (parts[1]?.[0] || '')).toUpperCase();
-    document.getElementById('profile-avatar').textContent = initials || 'ME';
-    document.querySelectorAll('.avatar').forEach(a => a.textContent = initials || 'ME');
-  }
-  if (email) document.getElementById('profile-email').textContent = email;
-  closeModal();
-  showToast('Profile updated');
-}
-
 function openVehicleModal() {
   const current = document.getElementById('vehicle-sub').textContent;
   openModal(`
     <div class="modal-title">My vehicle</div>
-    <div class="modal-field"><label class="modal-label">Year, make & model</label><input class="modal-input" id="vehicleInput" value="${current}"></div>
+    <div class="modal-field"><label class="modal-label">Year, make & model</label><input class="modal-input" id="vehicleInput" value="${current === 'No vehicle saved yet' ? '' : current}"></div>
     <div class="modal-btns">
       <button class="modal-btn secondary" onclick="closeModal()">Cancel</button>
       <button class="modal-btn primary" onclick="saveVehicle()">Save</button>
@@ -316,21 +383,17 @@ function saveVehicle() {
   const v = document.getElementById('vehicleInput').value.trim();
   if (v) {
     document.getElementById('vehicle-sub').textContent = v;
-    document.querySelector('.profile-plan').innerHTML = `<i class="ti ti-car" style="font-size:11px;"></i> ${v}`;
+    document.getElementById('vehicle-sub-settings').textContent = v;
   }
   closeModal();
-  showToast('Vehicle updated');
+  showToast('Vehicle updated for this session');
 }
 
 function openBillingModal() {
   openModal(`
     <div class="modal-title">Payment method</div>
-    <div class="modal-info-row"><div class="k">Card on file</div><div class="v">Visa ···· 4242</div></div>
-    <div class="modal-info-row"><div class="k">Billed</div><div class="v">Per completed service</div></div>
-    <div class="modal-btns">
-      <button class="modal-btn secondary" onclick="closeModal()">Close</button>
-      <button class="modal-btn primary" onclick="closeModal(); showToast('Redirecting to secure payment update…');">Update card</button>
-    </div>
+    <div class="modal-info-row"><div class="k">Billed</div><div class="v">Per completed service, via Stripe Checkout</div></div>
+    <div class="modal-btns"><button class="modal-btn secondary" onclick="closeModal()">Close</button></div>
   `);
 }
 
@@ -349,7 +412,7 @@ function openHelpModal() {
     <div class="modal-title">Help & support</div>
     <div class="modal-sub">Question about a request or a past service? Call, text, or send a message and we'll get back to you shortly.</div>
     <div class="modal-btns">
-      <a class="modal-btn secondary" href="tel:+12403151464" style="text-decoration:none;display:flex;align-items:center;justify-content:center;">Call (240) 315-1464</a>
+      <a class="modal-btn secondary" href="tel:+18776303102" style="text-decoration:none;display:flex;align-items:center;justify-content:center;">Call (877) 630-3102</a>
       <a class="modal-btn primary" href="../index.html#contact" style="text-decoration:none;display:flex;align-items:center;justify-content:center;">Send a message</a>
     </div>
   `);
@@ -361,13 +424,7 @@ function confirmSignOut() {
     <div class="modal-sub">You'll need to sign back in to see your requests and reviews.</div>
     <div class="modal-btns">
       <button class="modal-btn secondary" onclick="closeModal()">Cancel</button>
-      <button class="modal-btn danger" onclick="doSignOut()">Sign out</button>
+      <button class="modal-btn danger" onclick="closeModal(); realSignOut();">Sign out</button>
     </div>
   `);
-}
-function doSignOut() { closeModal(); document.getElementById('signoutOverlay').classList.add('show'); }
-function signBackIn() {
-  document.getElementById('signoutOverlay').classList.remove('show');
-  showScreen('screen-home');
-  showToast('Welcome back!');
 }
