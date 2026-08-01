@@ -17,10 +17,57 @@
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.10.0/tabler-icons.min.css">
 <link rel="stylesheet" href="styles.css">
+<style>
+  /* ===== Auth screen (sign in / sign up) ===== */
+  #authScreen {
+    position: fixed; inset: 0; z-index: 500;
+    background: #0A0A0A; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; padding: 24px;
+  }
+  #authScreen .auth-box { width: 100%; max-width: 360px; }
+  #authScreen .auth-logo { font-size: 40px; text-align: center; margin-bottom: 8px; }
+  #authScreen h1 { color: #fff; font-size: 22px; font-weight: 800; text-align: center; margin-bottom: 4px; }
+  #authScreen .auth-sub { color: rgba(255,255,255,0.5); font-size: 13.5px; text-align: center; margin-bottom: 28px; }
+  #authScreen input {
+    width: 100%; background: #141414; border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 10px; padding: 13px 14px; color: #fff; font-size: 14px;
+    margin-bottom: 12px; font-family: inherit;
+  }
+  #authScreen input:focus { outline: none; border-color: #F59E0B; }
+  #authScreen .auth-submit {
+    width: 100%; background: linear-gradient(135deg, #FCD34D, #D97706);
+    color: #2B1B00; font-weight: 700; font-size: 15px; padding: 13px;
+    border-radius: 10px; border: none; cursor: pointer; margin-top: 4px;
+  }
+  #authScreen .auth-switch {
+    text-align: center; margin-top: 18px; font-size: 13.5px; color: rgba(255,255,255,0.5);
+  }
+  #authScreen .auth-switch a { color: #F59E0B; font-weight: 600; text-decoration: none; }
+  #authScreen .auth-error {
+    color: #F87171; font-size: 13px; text-align: center; margin-bottom: 10px; min-height: 16px;
+  }
+</style>
 </head>
 <body>
 
-<div class="app" id="app">
+<!-- ===== AUTH (sign in / sign up) ===== -->
+<div id="authScreen">
+  <div class="auth-box">
+    <div class="auth-logo">🚨</div>
+    <h1 id="authTitle">Welcome back</h1>
+    <div class="auth-sub" id="authSubtitle">Sign in to request and manage your service</div>
+    <div class="auth-error" id="authError"></div>
+    <input type="email" id="authEmail" placeholder="Email address" autocomplete="email">
+    <input type="password" id="authPassword" placeholder="Password" autocomplete="current-password">
+    <button class="auth-submit" id="authSubmitBtn" onclick="handleAuthSubmit()">Sign in</button>
+    <div class="auth-switch">
+      <span id="authSwitchText">Don't have an account?</span>
+      <a href="#" id="authSwitchLink" onclick="toggleAuthMode(event)">Sign up</a>
+    </div>
+  </div>
+</div>
+
+<div class="app" id="app" style="display:none;">
   <div class="status-bar">
     <span id="clock">9:41</span>
     <span class="status-icons">●●●</span>
@@ -38,7 +85,7 @@
             <div class="brand-tagline">Help when you're stuck</div>
           </div>
         </div>
-        <div class="avatar">MR</div>
+        <div class="avatar" id="topAvatar">MR</div>
       </div>
     </div>
     <div class="scroll-area">
@@ -164,12 +211,12 @@
       <div class="row"><div class="page-title">Settings</div></div>
     </div>
     <div class="scroll-area">
-      <div class="profile-box" onclick="openEditProfileModal()">
-        <div class="profile-avatar" id="profile-avatar">MR</div>
+      <div class="profile-box">
+        <div class="profile-avatar" id="profile-avatar">ME</div>
         <div>
-          <div class="profile-name" id="profile-name">Marcus Rivera</div>
-          <div class="profile-email" id="profile-email">marcus@email.com</div>
-          <div class="profile-plan"><i class="ti ti-car" style="font-size:11px;"></i> 2019 Honda Civic</div>
+          <div class="profile-name" id="profile-name">My Account</div>
+          <div class="profile-email" id="profile-email"></div>
+          <div class="profile-plan"><i class="ti ti-car" style="font-size:11px;"></i> <span id="vehicle-sub-settings">No vehicle saved yet</span></div>
         </div>
       </div>
 
@@ -190,19 +237,14 @@
 
         <div class="settings-label">Account</div>
         <div class="settings-group">
-          <div class="settings-row" onclick="openEditProfileModal()">
-            <div class="sr-icon sr-green"><i class="ti ti-user"></i></div>
-            <div class="sr-info"><div class="sr-label">Edit profile</div></div>
-            <i class="ti ti-chevron-right sr-right"></i>
-          </div>
           <div class="settings-row" onclick="openVehicleModal()">
             <div class="sr-icon sr-blue"><i class="ti ti-car"></i></div>
-            <div class="sr-info"><div class="sr-label">My vehicle</div><div class="sr-sub" id="vehicle-sub">2019 Honda Civic</div></div>
+            <div class="sr-info"><div class="sr-label">My vehicle</div><div class="sr-sub" id="vehicle-sub">No vehicle saved yet</div></div>
             <i class="ti ti-chevron-right sr-right"></i>
           </div>
           <div class="settings-row" onclick="openBillingModal()">
             <div class="sr-icon sr-gray"><i class="ti ti-credit-card"></i></div>
-            <div class="sr-info"><div class="sr-label">Payment method</div><div class="sr-sub">Visa ···· 4242</div></div>
+            <div class="sr-info"><div class="sr-label">Payment method</div><div class="sr-sub">Managed securely via Stripe</div></div>
             <i class="ti ti-chevron-right sr-right"></i>
           </div>
         </div>
@@ -261,14 +303,7 @@
 <!-- TOAST -->
 <div class="toast" id="toast"><i class="ti ti-circle-check"></i><span id="toastMsg"></span></div>
 
-<!-- SIGN OUT OVERLAY -->
-<div class="signout-overlay" id="signoutOverlay">
-  <div class="scan-check"><i class="ti ti-check"></i></div>
-  <div class="modal-title">You've signed out</div>
-  <div class="msg">This is a demo build, so your data stays right here. Tap below to jump back in.</div>
-  <div class="modal-btn primary" style="max-width:220px;" onclick="signBackIn()">Sign back in</div>
-</div>
-
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="app.js"></script>
 <script src="interactions.js"></script>
 </body>
