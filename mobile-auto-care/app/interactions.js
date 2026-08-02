@@ -428,7 +428,7 @@ function openHelpModal() {
     <div class="modal-title">Help & support</div>
     <div class="modal-sub">Question about a booking or a past service? Call, text, or send a message and we'll get back to you shortly.</div>
     <div class="modal-btns">
-      <a class="modal-btn secondary" href="tel:+12403151464" style="text-decoration:none;display:flex;align-items:center;justify-content:center;">Call (240) 315-1464</a>
+     <a class="modal-btn secondary" href="tel:+18776303102" style="text-decoration:none;display:flex;align-items:center;justify-content:center;">Call (877) 630-3102</a>
       <a class="modal-btn primary" href="../index.html#contact" style="text-decoration:none;display:flex;align-items:center;justify-content:center;">Send a message</a>
     </div>
   `);
