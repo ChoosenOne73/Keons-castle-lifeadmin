@@ -13,8 +13,6 @@ let services = [
   { id: 'sv2', name: 'Flat Tire Change', emoji: '🛞', price: 65, desc: 'Swap to your spare on the spot, roadside or in a parking lot.' },
   { id: 'sv3', name: 'Lockout Service', emoji: '🔑', price: 60, desc: 'Locked your keys inside? We\u2019ll get you back in fast.' },
   { id: 'sv4', name: 'Fuel Delivery', emoji: '⛽', price: 50, desc: 'Ran out of gas? We\u2019ll bring enough to reach the nearest station.' },
-  { id: 'sv5', name: 'Winch-Out & Recovery', emoji: '🪢', price: 95, desc: 'Stuck in a ditch, snow, or mud \u2014 we\u2019ll pull you free safely.' },
-  { id: 'sv6', name: 'Towing', emoji: '🚚', price: 110, desc: 'When it can\u2019t be fixed roadside, we\u2019ll tow you to your shop of choice.' },
   { id: 'sv7', name: 'Minor Roadside Repair', emoji: '🔧', price: 85, desc: 'Belts, hoses, and quick fixes that can get you moving again.' },
   { id: 'sv8', name: 'Emergency Dispatch', emoji: '🚨', price: 75, desc: 'Not sure what\u2019s wrong? We\u2019ll diagnose on site.' }
 ];
@@ -24,7 +22,7 @@ let appointments = [];
 let reviews = [
   { id: 'rv1', name: 'Dana M.', initials: 'DM', rating: 5, service: 'Lockout Service', text: 'Locked my keys in the car at 11pm and they had someone there in 25 minutes.', date: '3 days ago' },
   { id: 'rv2', name: 'Theo R.', initials: 'TR', rating: 5, service: 'Flat Tire Change', text: 'Flat tire on the highway shoulder and I was back on the road in under 20 minutes.', date: '1 week ago' },
-  { id: 'rv3', name: 'Priya S.', initials: 'PS', rating: 5, service: 'Winch-Out & Recovery', text: 'Stuck in the snow off the road and they winched me out safely.', date: '2 weeks ago' },
+  { id: 'rv3', name: 'Priya S.', initials: 'PS', rating: 5, service: 'Lockout Service', text: 'Locked out at a gas station late at night and they had someone there fast.', date: '2 weeks ago' },
   { id: 'rv4', name: 'Ben T.', initials: 'BT', rating: 4, service: 'Jump Start', text: 'Quick and easy, though the wait was a bit longer than the estimate.', date: '3 weeks ago' }
 ];
 
