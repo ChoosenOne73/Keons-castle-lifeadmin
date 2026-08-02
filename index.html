@@ -76,6 +76,8 @@ section { max-width: 1100px; margin: 0 auto; padding: 80px 24px; }
 .app-card { background: var(--surface); border: 0.5px solid var(--border); border-radius: 22px; padding: 28px; display: flex; flex-direction: column; gap: 18px; transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s; cursor: pointer; text-decoration: none; color: inherit; }
 .app-card-soon { opacity: 0.88; position: relative; }
 .soon-badge { position: absolute; top: 22px; right: 22px; background: rgba(255,198,92,0.14); border: 1px solid rgba(255,198,92,0.4); color: #FFC65C; font-size: 11px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; padding: 5px 11px; border-radius: 20px; }
+.live-badge { position: absolute; top: 22px; right: 22px; background: rgba(143,225,66,0.14); border: 1px solid rgba(143,225,66,0.4); color: var(--green); font-size: 11px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; padding: 5px 11px; border-radius: 20px; display: flex; align-items: center; gap: 5px; }
+.live-badge .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); }
 .app-card-btn-soon { color: var(--text-faint); font-weight: 700; font-size: 14px; }
 .app-card-btn-preview { background: rgba(255,198,92,0.12); border: 1px solid rgba(255,198,92,0.4); color: #FFC65C; font-size: 13px; font-weight: 700; padding: 9px 18px; border-radius: 10px; transition: transform 0.15s, background 0.15s; }
 .app-card-soon:hover .app-card-btn-preview { background: rgba(255,198,92,0.2); transform: scale(1.03); }
@@ -170,8 +172,8 @@ footer { border-top: 0.5px solid var(--border); padding: 40px 24px; text-align: 
     <a href="lifeadmin-pwa/index.html" class="hero-app-chip" style="--c:#8FE142;">📋 LifeAdmin</a>
     <a href="neighborhood-helper/index.html" class="hero-app-chip" style="--c:#60A5FA;opacity:0.85;">🗺️ Neighborhood Helper · preview</a>
     <a href="leftovers/index.html" class="hero-app-chip" style="--c:#4AB471;opacity:0.85;">🌿 Leftovers · preview</a>
-    <a href="mobile-auto-care/index.html" class="hero-app-chip" style="--c:#FB923C;opacity:0.85;">🔧 Auto Care · preview</a>
-    <a href="roadside-assist/index.html" class="hero-app-chip" style="--c:#4FA8E0;opacity:0.85;">⚔️ Roadside Warriors · preview</a>
+    <a href="mobile-auto-care/index.html" class="hero-app-chip" style="--c:#FB923C;">🔧 Auto Care</a>
+    <a href="roadside-assist/index.html" class="hero-app-chip" style="--c:#4FA8E0;">⚔️ Roadside Warriors</a>
     <a href="lifeadmin-pwa/index.html" class="hero-app-chip" style="--c:#FFC65C;">📖 Guides</a>
   </div>
   <div class="hero-btns">
@@ -198,6 +200,7 @@ footer { border-top: 0.5px solid var(--border); padding: 40px 24px; text-align: 
 
     <!-- LIFEADMIN -->
     <a class="app-card" href="lifeadmin-pwa/index.html" aria-label="LifeAdmin app">
+      <div class="live-badge"><span class="dot"></span>Live</div>
       <div class="app-card-header">
         <div class="app-card-icon aci-green">
           <svg width="28" height="34" viewBox="0 0 130 160" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -275,8 +278,8 @@ footer { border-top: 0.5px solid var(--border); padding: 40px 24px; text-align: 
       </div>
     </a>
 
-    <a class="app-card app-card-soon" href="mobile-auto-care/index.html" aria-label="Keon's Castle Mobile Auto Care preview">
-      <div class="soon-badge">Coming soon</div>
+    <a class="app-card" href="mobile-auto-care/index.html" aria-label="Keon's Castle Mobile Auto Care">
+      <div class="live-badge"><span class="dot"></span>Live</div>
       <div class="app-card-header">
         <div class="app-card-icon aci-orange">🔧</div>
         <div>
@@ -293,12 +296,12 @@ footer { border-top: 0.5px solid var(--border); padding: 40px 24px; text-align: 
       </div>
       <div class="app-card-footer">
         <div class="app-card-price">Pay per service · no subscription</div>
-        <span class="app-card-btn-preview">Preview demo →</span>
+        <span class="app-card-btn">Book now →</span>
       </div>
     </a>
 
-    <a class="app-card app-card-soon" href="roadside-assist/index.html" aria-label="Roadside Warriors preview">
-      <div class="soon-badge">Coming soon</div>
+    <a class="app-card" href="roadside-assist/index.html" aria-label="Roadside Warriors">
+      <div class="live-badge"><span class="dot"></span>Live</div>
       <div class="app-card-header">
         <div class="app-card-icon aci-sky">⚔️</div>
         <div>
@@ -315,7 +318,7 @@ footer { border-top: 0.5px solid var(--border); padding: 40px 24px; text-align: 
       </div>
       <div class="app-card-footer">
         <div class="app-card-price">$50 dispatch fee + service charge</div>
-        <span class="app-card-btn-preview">Preview demo →</span>
+        <span class="app-card-btn">Get help now →</span>
       </div>
     </a>
 
