@@ -73,15 +73,13 @@ section { max-width: 1100px; margin: 0 auto; padding: 80px 24px; }
 
 /* APPS GRID */
 .apps-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
-.app-card { background: var(--surface); border: 0.5px solid var(--border); border-radius: 22px; padding: 28px; display: flex; flex-direction: column; gap: 18px; transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s; cursor: pointer; text-decoration: none; color: inherit; }
-.app-card-soon { opacity: 0.88; position: relative; }
-.soon-badge { position: absolute; top: 22px; right: 22px; background: rgba(255,198,92,0.14); border: 1px solid rgba(255,198,92,0.4); color: #FFC65C; font-size: 11px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; padding: 5px 11px; border-radius: 20px; }
+.app-card { background: var(--surface); border: 0.5px solid var(--border); border-radius: 22px; padding: 28px; display: flex; flex-direction: column; gap: 18px; transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s; cursor: pointer; text-decoration: none; color: inherit; position: relative; }
+.app-card:hover { transform: translateY(-4px); border-color: rgba(143,225,66,0.3); box-shadow: 0 20px 50px rgba(0,0,0,0.3); }
+.app-card.coming-soon { opacity: 0.6; cursor: default; }
+.app-card.coming-soon:hover { transform: none; border-color: var(--border); box-shadow: none; }
 .live-badge { position: absolute; top: 22px; right: 22px; background: rgba(143,225,66,0.14); border: 1px solid rgba(143,225,66,0.4); color: var(--green); font-size: 11px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; padding: 5px 11px; border-radius: 20px; display: flex; align-items: center; gap: 5px; }
 .live-badge .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); }
-.app-card-btn-soon { color: var(--text-faint); font-weight: 700; font-size: 14px; }
-.app-card-btn-preview { background: rgba(255,198,92,0.12); border: 1px solid rgba(255,198,92,0.4); color: #FFC65C; font-size: 13px; font-weight: 700; padding: 9px 18px; border-radius: 10px; transition: transform 0.15s, background 0.15s; }
-.app-card-soon:hover .app-card-btn-preview { background: rgba(255,198,92,0.2); transform: scale(1.03); }
-.app-card:hover { transform: translateY(-4px); border-color: rgba(143,225,66,0.3); box-shadow: 0 20px 50px rgba(0,0,0,0.3); }
+.coming-badge { background: rgba(255,255,255,0.07); color: var(--text-faint); font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 6px; }
 .app-card-header { display: flex; align-items: center; gap: 14px; }
 .app-card-icon { width: 56px; height: 56px; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 26px; flex-shrink: 0; }
 .aci-green { background: linear-gradient(135deg, rgba(143,225,66,0.2), rgba(86,171,47,0.1)); border: 1px solid rgba(143,225,66,0.2); }
@@ -101,9 +99,6 @@ section { max-width: 1100px; margin: 0 auto; padding: 80px 24px; }
 .app-card-price strong { color: var(--green); font-size: 15px; }
 .app-card-btn { background: linear-gradient(135deg, var(--green-bright), var(--green-dark)); color: #08230A; font-size: 13px; font-weight: 700; padding: 9px 18px; border-radius: 10px; text-decoration: none; transition: transform 0.15s; }
 .app-card-btn:hover { transform: scale(1.03); }
-.app-card.coming-soon { opacity: 0.6; cursor: default; }
-.app-card.coming-soon:hover { transform: none; border-color: var(--border); box-shadow: none; }
-.coming-badge { background: rgba(255,255,255,0.07); color: var(--text-faint); font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 6px; }
 
 /* HOW IT WORKS */
 .steps-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
@@ -170,8 +165,8 @@ footer { border-top: 0.5px solid var(--border); padding: 40px 24px; text-align: 
   <p>Keon's Castle LLC builds apps and services that handle the stuff you always forget — deadlines, meals, neighbors, your car, and even the road. One company, six ways to make life easier.</p>
   <div class="hero-app-strip">
     <a href="lifeadmin-pwa/index.html" class="hero-app-chip" style="--c:#8FE142;">📋 LifeAdmin</a>
-    <a href="neighborhood-helper/index.html" class="hero-app-chip" style="--c:#60A5FA;opacity:0.85;">🗺️ Neighborhood Helper · preview</a>
-    <a href="leftovers/index.html" class="hero-app-chip" style="--c:#4AB471;opacity:0.85;">🌿 Leftovers · preview</a>
+    <a href="leftovers/index.html" class="hero-app-chip" style="--c:#4AB471;">🌿 Leftovers</a>
+    <a href="#apps" class="hero-app-chip" style="--c:#60A5FA;opacity:0.85;">🗺️ Neighborhood Helper · coming soon</a>
     <a href="mobile-auto-care/index.html" class="hero-app-chip" style="--c:#FB923C;">🔧 Auto Care</a>
     <a href="roadside-assist/index.html" class="hero-app-chip" style="--c:#4FA8E0;">⚔️ Roadside Warriors</a>
     <a href="#apps" class="hero-app-chip" style="--c:#FFC65C;opacity:0.85;">📖 Guides · coming soon</a>
@@ -233,8 +228,8 @@ footer { border-top: 0.5px solid var(--border); padding: 40px 24px; text-align: 
     </a>
 
     <!-- LEFTOVERS -->
-    <a class="app-card app-card-soon" href="leftovers/index.html" aria-label="Leftovers app preview">
-      <div class="soon-badge">Coming soon</div>
+    <a class="app-card" href="leftovers/index.html" aria-label="Leftovers app">
+      <div class="live-badge"><span class="dot"></span>Live</div>
       <div class="app-card-header">
         <div class="app-card-icon aci-teal">🌿</div>
         <div>
@@ -251,13 +246,13 @@ footer { border-top: 0.5px solid var(--border); padding: 40px 24px; text-align: 
       </div>
       <div class="app-card-footer">
         <div class="app-card-price">14-day free trial · then <strong>$3.99/mo</strong></div>
-        <span class="app-card-btn-preview">Preview demo →</span>
+        <span class="app-card-btn">Try free →</span>
       </div>
     </a>
 
     <!-- NEIGHBORHOOD HELPER -->
-    <a class="app-card app-card-soon" href="neighborhood-helper/index.html" aria-label="Neighborhood Helper app preview">
-      <div class="soon-badge">Coming soon</div>
+    <div class="app-card coming-soon" aria-label="Neighborhood Helper app — coming soon">
+      <div class="coming-badge" style="position:absolute;top:22px;right:22px;">Coming soon</div>
       <div class="app-card-header">
         <div class="app-card-icon aci-blue">🗺️</div>
         <div>
@@ -274,10 +269,11 @@ footer { border-top: 0.5px solid var(--border); padding: 40px 24px; text-align: 
       </div>
       <div class="app-card-footer">
         <div class="app-card-price">14-day free trial · then <strong>$3.99/mo</strong></div>
-        <span class="app-card-btn-preview">Preview demo →</span>
+        <span class="coming-badge">Coming soon</span>
       </div>
-    </a>
+    </div>
 
+    <!-- AUTO CARE -->
     <a class="app-card" href="mobile-auto-care/index.html" aria-label="Keon's Castle Mobile Auto Care">
       <div class="live-badge"><span class="dot"></span>Live</div>
       <div class="app-card-header">
@@ -300,6 +296,7 @@ footer { border-top: 0.5px solid var(--border); padding: 40px 24px; text-align: 
       </div>
     </a>
 
+    <!-- ROADSIDE WARRIORS -->
     <a class="app-card" href="roadside-assist/index.html" aria-label="Roadside Warriors">
       <div class="live-badge"><span class="dot"></span>Live</div>
       <div class="app-card-header">
@@ -342,8 +339,8 @@ footer { border-top: 0.5px solid var(--border); padding: 40px 24px; text-align: 
       </div>
     </div>
 
-    <a class="app-card app-card-soon" href="web-studio/index.html" aria-label="Keon's Castle Web Studio preview">
-      <div class="soon-badge">Coming soon</div>
+    <!-- WEB STUDIO -->
+    <div class="app-card coming-soon" aria-label="Keon's Castle Web Studio — coming soon">
       <div class="app-card-header">
         <div class="app-card-icon aci-green"><i class="ti ti-code"></i></div>
         <div>
@@ -351,7 +348,7 @@ footer { border-top: 0.5px solid var(--border); padding: 40px 24px; text-align: 
           <div class="app-card-tagline">Ready-to-use websites & apps</div>
         </div>
       </div>
-      <div class="app-card-desc">Need a real website or app for your own business? We build booking systems, marketplaces, subscription apps, and business sites — the same way we built our own five apps.</div>
+      <div class="app-card-desc">Need a real website or app for your own business? We build booking systems, marketplaces, subscription apps, and business sites — the same way we built our own apps.</div>
       <div class="app-card-features">
         <div class="app-feature"><i class="ti ti-code"></i> Real, working software — not a mockup</div>
         <div class="app-feature"><i class="ti ti-credit-card"></i> Stripe-powered payments & subscriptions</div>
@@ -360,9 +357,9 @@ footer { border-top: 0.5px solid var(--border); padding: 40px 24px; text-align: 
       </div>
       <div class="app-card-footer">
         <div class="app-card-price">Custom quote per project</div>
-        <span class="app-card-btn-preview">Preview demo →</span>
+        <span class="coming-badge">Coming soon</span>
       </div>
-    </a>
+    </div>
 
   </div>
 </section>
@@ -436,4 +433,29 @@ footer { border-top: 0.5px solid var(--border); padding: 40px 24px; text-align: 
       <a class="footer-link" href="#how">How it works</a>
       <a class="footer-link" href="mailto:llgilchrist73@gmail.com">Contact</a>
       <a class="footer-link" href="privacy.html">Privacy Policy</a>
-      <a class="footer-link"
+      <a class="footer-link" href="terms.html">Terms of Service</a>
+    </div>
+    <div class="footer-copy">© 2026 Keons Castle LLC. All rights reserved.</div>
+  </div>
+</footer>
+
+<script>
+function toggleMenu() {
+  const links = document.querySelector('.nav-links');
+  if (links.style.display === 'flex') {
+    links.style.display = 'none';
+  } else {
+    links.style.display = 'flex';
+    links.style.flexDirection = 'column';
+    links.style.position = 'absolute';
+    links.style.top = '64px';
+    links.style.left = '0';
+    links.style.right = '0';
+    links.style.background = '#0A0A0A';
+    links.style.padding = '16px 24px 24px';
+    links.style.borderBottom = '0.5px solid rgba(255,255,255,0.07)';
+  }
+}
+</script>
+</body>
+</html>
