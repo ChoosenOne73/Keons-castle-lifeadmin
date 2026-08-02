@@ -10,7 +10,7 @@ let currentUser = null;
 // ===== Data =====
 let services = [
   { id: 'sv1', name: 'Jump Start', emoji: '🔋', price: 55, desc: 'Dead battery? We\u2019ll get your engine running again in minutes.' },
-  { id: 'sv2', name: 'Flat Tire Change', emoji: '🛞', price: 65, desc: 'Swap to your spare on the spot, roadside or in a parking lot.' },
+  { id: 'sv2', name: 'Flat Tire Change', emoji: '🛞', price: 65, desc: 'Swap to your spare on the spot, roadside or in a parking lot.' },{ id: 'sv9', name: 'Tire Plug', emoji: '🔩', price: 35, desc: 'Quick puncture repair on the spot, so you can skip the spare entirely.' },
   { id: 'sv3', name: 'Lockout Service', emoji: '🔑', price: 60, desc: 'Locked your keys inside? We\u2019ll get you back in fast.' },
   { id: 'sv4', name: 'Fuel Delivery', emoji: '⛽', price: 50, desc: 'Ran out of gas? We\u2019ll bring enough to reach the nearest station.' },
   { id: 'sv7', name: 'Minor Roadside Repair', emoji: '🔧', price: 85, desc: 'Belts, hoses, and quick fixes that can get you moving again.' },
