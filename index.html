@@ -174,7 +174,7 @@ footer { border-top: 0.5px solid var(--border); padding: 40px 24px; text-align: 
     <a href="leftovers/index.html" class="hero-app-chip" style="--c:#4AB471;opacity:0.85;">🌿 Leftovers · preview</a>
     <a href="mobile-auto-care/index.html" class="hero-app-chip" style="--c:#FB923C;">🔧 Auto Care</a>
     <a href="roadside-assist/index.html" class="hero-app-chip" style="--c:#4FA8E0;">⚔️ Roadside Warriors</a>
-    <a href="lifeadmin-pwa/index.html" class="hero-app-chip" style="--c:#FFC65C;">📖 Guides</a>
+    <a href="#apps" class="hero-app-chip" style="--c:#FFC65C;opacity:0.85;">📖 Guides · coming soon</a>
   </div>
   <div class="hero-btns">
     <a class="btn-primary" href="#apps">Explore everything</a>
@@ -322,7 +322,8 @@ footer { border-top: 0.5px solid var(--border); padding: 40px 24px; text-align: 
       </div>
     </a>
 
-    <a class="app-card" href="lifeadmin-pwa/index.html" aria-label="Business & Credit Guides">
+    <!-- BUSINESS & CREDIT GUIDES -->
+    <div class="app-card coming-soon" aria-label="Business & Credit Guides — coming soon">
       <div class="app-card-header">
         <div class="app-card-icon aci-gold"><i class="ti ti-book-2"></i></div>
         <div>
@@ -330,18 +331,16 @@ footer { border-top: 0.5px solid var(--border); padding: 40px 24px; text-align: 
           <div class="app-card-tagline">Authored by L. Gilchrist</div>
         </div>
       </div>
-      <div class="app-card-desc">Advisory guides on building credit, structuring an LLC, and securing business funding — plus ready-to-use dispute letter templates. Paid, one-time purchase — available inside the LifeAdmin app.</div>
+      <div class="app-card-desc">Advisory guides on building credit, structuring an LLC, and securing business funding — plus ready-to-use dispute letter templates.</div>
       <div class="app-card-features">
         <div class="app-feature"><i class="ti ti-trending-up"></i> Credit-building strategy guides</div>
         <div class="app-feature"><i class="ti ti-building-bank"></i> LLC funding playbooks</div>
-        <div class="app-feature"><i class="ti ti-file-text"></i> Fillable dispute letter templates</div>
-        <div class="app-feature"><i class="ti ti-download"></i> Instant download after purchase</div>
       </div>
       <div class="app-card-footer">
-        <div class="app-card-price"><span style="color:#FB923C;font-weight:700;">$7.99–$19.99</span> per guide · no subscription</div>
-        <span class="app-card-btn">Buy a guide →</span>
+        <div class="app-card-price"><span style="color:#FB923C;font-weight:700;">$7.50</span> per guide · no subscription</div>
+        <span class="coming-badge">Coming soon</span>
       </div>
-    </a>
+    </div>
 
     <a class="app-card app-card-soon" href="web-studio/index.html" aria-label="Keon's Castle Web Studio preview">
       <div class="soon-badge">Coming soon</div>
@@ -437,29 +436,4 @@ footer { border-top: 0.5px solid var(--border); padding: 40px 24px; text-align: 
       <a class="footer-link" href="#how">How it works</a>
       <a class="footer-link" href="mailto:llgilchrist73@gmail.com">Contact</a>
       <a class="footer-link" href="privacy.html">Privacy Policy</a>
-      <a class="footer-link" href="terms.html">Terms of Service</a>
-    </div>
-    <div class="footer-copy">© 2026 Keons Castle LLC. All rights reserved.</div>
-  </div>
-</footer>
-
-<script>
-function toggleMenu() {
-  const links = document.querySelector('.nav-links');
-  if (links.style.display === 'flex') {
-    links.style.display = 'none';
-  } else {
-    links.style.display = 'flex';
-    links.style.flexDirection = 'column';
-    links.style.position = 'absolute';
-    links.style.top = '64px';
-    links.style.left = '0';
-    links.style.right = '0';
-    links.style.background = '#0A0A0A';
-    links.style.padding = '16px 24px 24px';
-    links.style.borderBottom = '0.5px solid rgba(255,255,255,0.07)';
-  }
-}
-</script>
-</body>
-</html>
+      <a class="footer-link"
